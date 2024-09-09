@@ -1,16 +1,16 @@
-#include "mantiss_format.h"
-short before_dot_check(char *my_double, char *format_double, size_t *i_m, size_t *ind_format, short *flag)
+#include "parse_double.h"
+short before_dot_check(char *my_double, char *mantissa, size_t *i_m, size_t *ind_format, short *flag)
 {
     while (my_double[*i_m] != '.' && my_double[*i_m] != '\0')
     {
         if (my_double[*i_m] - '0' && !(*flag))
         {
             *flag = *i_m;
-            format_double[(*ind_format)++] = my_double[*i_m];
+            mantissa[(*ind_format)++] = my_double[*i_m];
         }
 
-        if (*flag && *flag != *i_m)
-            format_double[(*ind_format)++] = my_double[*i_m];
+        if (*flag && (int)*flag != (int)*i_m)
+            mantissa[(*ind_format)++] = my_double[*i_m];
 
         if (my_double[*i_m] < '0' || my_double[*i_m] > '9')
         {
@@ -29,7 +29,7 @@ short before_dot_check(char *my_double, char *format_double, size_t *i_m, size_t
     return EXIT_SUCCESS;
 }
 
-short exp_check(char *my_double, char *format_double, size_t *i_m, size_t *ind_format, short *flag, char *sign_exp)
+short exp_check(char *my_double, size_t *i_m, char *sign_exp)
 {
     while (my_double[*i_m] != 'E' && my_double[*i_m] != 'e' && my_double[*i_m] != '\0')
     {
@@ -56,7 +56,7 @@ short exp_check(char *my_double, char *format_double, size_t *i_m, size_t *ind_f
 short order_check(char *my_double, size_t *k)
 {
     printf("order_size : %zu\n", strlen(my_double) - *k);
-    if (strlen(my_double) - *k > MAX_ORDER || strlen(my_double) - *k == 0)
+    if (strlen(my_double) - *k > MAX_LEN_ORDER || strlen(my_double) - *k == 0)
         return WRONG_SIZE_ORDER;
 
     while (my_double[*k] != '\0')
@@ -82,7 +82,7 @@ void fill_after_dot(char *my_double, char *temp_str, size_t *i_m, size_t *temp_i
                 *flag = *i_m;
                 temp_str[(*temp_ind)++] = my_double[*i_m];
             }
-            if (*flag && *flag != *i_m)
+            if (*flag && (int)*flag != (int)*i_m)
                 temp_str[(*temp_ind)++] = my_double[*i_m];
         }
         (*i_m)--;
@@ -90,30 +90,32 @@ void fill_after_dot(char *my_double, char *temp_str, size_t *i_m, size_t *temp_i
 }
 
 
-short check_mantiss(char *my_double, char *format_double)
+short check_mantiss(char *my_double, double_data *whole_num)
 {
     if (my_double[0] != '+' && my_double[0] != '-')
     {
         printf("Нет знака!\n");
         return WRONG_SIGN;
     }
+    
     size_t i_m = 1;
     short m = 0, n = 0;
     short flag = 0;
-    size_t ind = 1;
-    format_double[0] = my_double[0];
-    short db = before_dot_check(my_double, format_double, &i_m, &ind, &flag);
+    size_t ind = 0;
+    whole_num->num_sign = my_double[0];
+    short db = before_dot_check(my_double, whole_num->mantissa, &i_m, &ind, &flag);
+    // printf("before dot manti : %s\n", whole_num->mantissa);
     if (db != 0)
         return db;
 
     m = i_m - flag;
     short dot = i_m;
-    
-    format_double[ind++] = my_double[i_m++];
 
-    char sign_exp;
-    short ec = exp_check(my_double, format_double, &i_m, &ind, &flag, &sign_exp);
-    if (sign_exp != '+' && sign_exp != '-')
+    // Ставим точку
+    whole_num->mantissa[ind++] = my_double[i_m++];
+
+    short ec = exp_check(my_double, &i_m, &whole_num->exp_sign);
+    if (whole_num->exp_sign != '+' && whole_num->exp_sign != '-')
     {
         printf("Неверный знак в экспоненте!\n");
         return WRONG_SIGN_EXP;
@@ -136,12 +138,10 @@ short check_mantiss(char *my_double, char *format_double)
         return oc;
 
     for (size_t i = temp_ind; i > 0; i--)
-        format_double[ind++] = temp_str[i - 1];
-
-    format_double[ind++] = 'E';
-    format_double[ind++] = sign_exp;
+        whole_num->mantissa[ind++] = temp_str[i - 1];
+    size_t c = 0;
     for (size_t i = temp_k; i < strlen(my_double); i++)
-        format_double[ind++] = my_double[i];
+        whole_num->order[c++] = my_double[i];
 
     n = flag - dot;
     if (m + n > 30)
@@ -150,35 +150,4 @@ short check_mantiss(char *my_double, char *format_double)
         return TOO_MANY_DIGITS;
     }
     return EXIT_SUCCESS;
-}
-
-
-short check_int(char *my_int)
-{
-    size_t len = strlen(my_int);
-    size_t i = 0;
-    if (my_int[0] > '0' && my_int[0] < '9')
-    {
-        i = 0;
-    }
-    else if (my_int[0] == '+' || my_int[0] == '-')
-    {
-        i = 1;
-    }
-    else
-    {
-        printf("Неправильный знак в целом числе!\n");
-        return WRONG_SIGN;
-    }
-    for (; i < len; i++)
-    {
-        if (my_int[i] < '0' || my_int[i] > '9')
-        {
-            printf("Неожиданный символ в целом числе! - %zu\n", i);
-            return WRONG_CHAR;
-        } 
-    }
-    
-    return EXIT_SUCCESS;
-
 }
