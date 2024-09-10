@@ -45,6 +45,7 @@ void print_matrix(int matrix[MAX_LEN_ROW][MAX_LEN_COLUMN], size_t rows, size_t c
         }
         printf("\n");
     }
+    printf("\n");
 }
 
 void matrix_generator(double_data *double_num, int_data *int_num, result_data *result_num)
