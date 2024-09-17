@@ -7,6 +7,6 @@
 #include <string.h>
 
 
-int input(int_data *int_num, double_data *double_num);
+int input(char *int_num, char *double_num);
 
 #endif

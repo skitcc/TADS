@@ -3,9 +3,14 @@
 
 #include "definitions.h"
 #include "struct.h"
+#include "notations.h"
+
+#include <stdbool.h>
+#include <stdlib.h>
+#include <ctype.h>
 
 
-int mantissa_check(double_data *double_num);
+int mantissa_check(char *double_num, char *new_double);
 
 
 

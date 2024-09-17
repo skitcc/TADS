@@ -4,10 +4,11 @@
 #include "definitions.h"
 #include "struct.h"
 #include <stddef.h>
+#include <ctype.h>
 
 
 
-short check_int(char *my_int, int_data *whole_num);
+short check_int(char *my_int, char *new_int);
 
 
 #endif

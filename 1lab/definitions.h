@@ -7,8 +7,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_LEN_INT 39
+#define MAX_LEN_INT 40
 #define MAX_LEN_DOUBLE 37
+#define MAX_LEN_DOUBLE_I 50
 
 #define MAX_LEN_MANTISSA 31
 #define MAX_LEN_MANTISSA_I 40
