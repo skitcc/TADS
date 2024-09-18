@@ -10,7 +10,7 @@ int input(char *int_num, char *double_num)
         return 1;
 
 
-    
+
     printf("Введите вещественное число\n");
     printf("+---------1---------2---------3\n");
     // getchar();

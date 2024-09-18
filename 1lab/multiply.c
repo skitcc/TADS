@@ -212,9 +212,8 @@ int form_result(int *result_mas, size_t len, result_data *result_num, double_dat
     int int_len = strlen(int_num->int_value);
     int new_order = int_order + int_len - 1;
 
-    if (len > MAX_LEN_MANTISS_RESULT_REAL) {
-        new_order += (len - MAX_LEN_MANTISS_RESULT_REAL);
-    }
+    // Исправление: увеличиваем порядок на число цифр в результате
+    // new_order += last_non_zero - 1;
 
     if (new_order < 0) {
         result_num->exp_sign = '-';

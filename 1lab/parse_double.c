@@ -111,13 +111,53 @@ int mantissa_check(char *double_num, char *new_double) {
     }
 
 
+
     if (double_num[0] == '.') {
         char_insertion(double_num, len, '0');
         len++;
     }
 
-    if (double_num[0] >= '0' && double_num[0] <= '9' && strchr(double_num, '.') == NULL) {
+
+    if (double_num[0] >= '0' && double_num[0] <= '9' && dot_p1 != NULL) {
+        printf("here\n");
+
+        char *p1 = dot_p1;
+        size_t dot_pos = (size_t)(p1 - double_num);
+
+        if (dot_pos == 1 && double_num[0] == '0')
+            order = 0;
+
+        else
+        {
+            size_t temp_order = dot_pos;
+            move_char_start(double_num, dot_pos);
+            char_insertion(double_num, ++len, '0');
+            order = temp_order;
+        }
+
+
+        
+    }
+
+    if ((isdigit(double_num[0]) || (double_num[0] == '-' || double_num[0] == '+')) && dot_p1 == NULL) {
         size_t first_non_zero = 0;
+        // printf("here\n");
+        char sign = '+';
+        if (isdigit(double_num[0]) || double_num[0] == '+')
+            sign = '+';
+        else
+            sign = '-';
+        if (double_num[0] == '+' || double_num[0] == '-')
+        {
+            for (size_t i = 0; i < len - 1; i++)
+            {
+                char temp = double_num[i + 1];
+                double_num[i + 1] = double_num[i];
+                double_num[i] = temp;
+            }
+            len--;
+        }
+        
         while (double_num[first_non_zero] == '0' && first_non_zero < len - 1) {
             first_non_zero++;
         }
@@ -130,9 +170,12 @@ int mantissa_check(char *double_num, char *new_double) {
         }
         char_insertion(double_num, len, '.');
         char_insertion(double_num, len + 1, '0');
-        len += 2;
-        order = len - 2;
+        char_insertion(double_num, len + 2, sign);
+        len += 3;
+        order = len - 3;
     }
+    printf("my_double : %s\n", double_num);
+
 
     char *dot_ptr = strchr(double_num, '.');
     char *e_ptr = (strchr(double_num, 'E') != NULL) ? strchr(double_num, 'E') : strchr(double_num, 'e');
@@ -183,6 +226,8 @@ int mantissa_check(char *double_num, char *new_double) {
         new_double[0] = '-';
         start = 1;
     }
+
+    
    
     for (size_t i = start; i < dot_pos; i++) {
         // printf("%d\n", double_num[i]);
@@ -212,6 +257,8 @@ int mantissa_check(char *double_num, char *new_double) {
 
         
     strcat(new_double, new_order_str);
+
+    // new_double[c + strlen(new_order_str) - 1] = '\0';
 
     char *dot_p2 = strchr(new_double, '.');
     char *e_p2 = (strchr(new_double, 'E') != NULL) ? strchr(new_double, 'E') : strchr(new_double, 'e');
