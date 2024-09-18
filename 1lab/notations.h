@@ -5,6 +5,8 @@
 #include <string.h>
 #include <stdlib.h>
 
+#include <ctype.h>
+
 int is_valid_scientific_notation(const char *str, char *new_str);
 int convert_single_digit_exp(char *str, char *new_double);
 

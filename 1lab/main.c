@@ -41,6 +41,7 @@ int main(void)
     short rm = mantissa_check(double_num, new_double);
 
     // printf("new_double : %s\n", new_double);
+    printf("rm = %d\n", rm);
     if (rm)
         return rm;
 
@@ -50,9 +51,9 @@ int main(void)
     distribute_to_int_data(&whole_int_num, new_int, strlen(new_int));
 
 
-    printf("Приведенное к стандарту целое число : %c%sE%c%s\n", whole_double_num.num_sign, whole_double_num.mantissa, whole_double_num.exp_sign, whole_double_num.order);
+    printf("Приведенное к стандарту целое число : %c%s\n", whole_int_num.num_sign, whole_int_num.int_value);
 
-    printf("Приведенное к стандарту вещественное число : %c%s\n", whole_int_num.num_sign, whole_int_num.int_value);
+    printf("Приведенное к стандарту вещественное число : %c%sE%c%s\n", whole_double_num.num_sign, whole_double_num.mantissa, whole_double_num.exp_sign, whole_double_num.order);
 
 
     if (matrix_generator(&whole_double_num, &whole_int_num, &whole_result_num)) 

@@ -64,6 +64,9 @@ int convert_single_digit_exp(char *str, char *new_double) {
     }
 
     if (str[i] >= '0' && str[i] <= '9' && (str[i + 1] == 'e' || str[i + 1] == 'E')) {
+
+        if ((str[i + 2] != '+' || str[i + 2] != '-') && !isdigit(str[i + 2]))
+            return 0;
         new_double[j++] = '0';
         new_double[j++] = '.';
         new_double[j++] = str[i];

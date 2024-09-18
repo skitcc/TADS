@@ -103,9 +103,13 @@ int mantissa_check(char *double_num, char *new_double) {
     }
 
     if (e_p1 && !dot_p1) {
-        convert_single_digit_exp(double_num, new_double);
+        int rm = convert_single_digit_exp(double_num, new_double);
+        printf("rm parse : %d\n", rm);
+        if (!rm)
+            return 2;
         return 0;
     }
+
 
     if (double_num[0] == '.') {
         char_insertion(double_num, len, '0');
@@ -214,6 +218,7 @@ int mantissa_check(char *double_num, char *new_double) {
     
     size_t dot_po2 = (dot_p2 != NULL) ? (size_t)(dot_p2 - new_double) : c;
     size_t e_po2 = (e_p2 != NULL) ? (size_t)(e_p2 - new_double) : c;
+
 
     printf("dot_po2 : %zu , e_po2 : %zu\n",dot_po2, e_po2);
 
