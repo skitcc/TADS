@@ -24,6 +24,7 @@ void reverse_array(int *arr, size_t size)
     }
 }
 
+
 // void print_matrix(int matrix[MAX_LEN_ROW][MAX_LEN_COLUMN], size_t rows, size_t cols)
 // {
 //     for (size_t i = 0; i < rows; i++)
@@ -152,8 +153,16 @@ void matrix_solver(int matrix[][MAX_LEN_COLUMN], size_t rows, size_t cols, int *
     }
 
     size_t current_len = cols;
+    
+
     if (carry > 0 && current_len < 40) {
-        int new_order = atoi(double_num->order) + 1;
+        int new_order = 0;
+        if (double_num->exp_sign == '-')
+            new_order = -atoi(double_num->order);
+        else
+            new_order = atoi(double_num->order);
+        new_order++;
+        new_order = abs(new_order);
         char buf[100];
         separate_digit(new_order, buf);
         strcpy(double_num->order, buf);
