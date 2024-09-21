@@ -59,20 +59,14 @@ int convert_single_digit_exp(char *str, char *new_double) {
     printf("jdlkndlkneslkf\n");
     if (str[i] == '+' || str[i] == '-') {
         new_double[j++] = str[i++];
-    } else {
+    } else if (isdigit(str[i])){
         new_double[j++] = '+';
     }
+    else
+        return 0;
 
     char *e_ptr = strchr(str, 'e');
     size_t e_pos = (size_t)(e_ptr - str);
-    // int e_i = e_pos + 1;
-    // int e_t = 0;
-    // char old_order[10];
-    // while (str[e_i] != '\0' && str[e_i] != '\n')
-    // {
-    //     old_order[e_t++] = str[e_i++];
-    // }
-    // int old_int_order = atoi(old_order);
 
     if (str[i] >= '0' && str[i] <= '9' && e_ptr) {
 
@@ -87,6 +81,8 @@ int convert_single_digit_exp(char *str, char *new_double) {
         while (i < e_pos)
         {
             new_double[j++] = str[i++];
+            if (!isdigit(str[i]))
+                return 0;
             diff_order++;
         }
         
