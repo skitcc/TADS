@@ -63,10 +63,7 @@ short check_int(char *input, int_data *new_int)
     sign_validation(&temp, &new_int->num_sign);
 
     if (int_fill(&temp, new_int->int_value, &new_int->len) != 0)
-    {
-        printf("Длина целого числа превышает 40 символов!\n");
         return ERROR_TOO_LONG_INT;
-    }
-
+        
     return EXIT_SUCCESS; 
 }

@@ -29,7 +29,7 @@ int mantissa_before_dot_fill(char **input, int *mantissa, size_t *mantissa_len)
     {
         if (*mantissa_len >= MAX_LEN_MANTISSA)
         {
-            printf("Длина мантиссы превышает 40 символов!\n");
+            printf("Длина мантиссы превышает 30 символов!\n");
             return ERROR_TOO_LONG_MANTISSA;
         }
         mantissa[(*mantissa_len)++] = *((*input)++) - '0';
@@ -46,7 +46,7 @@ int mantissa_after_dot_fill(char **input, int *mantissa, size_t *mantissa_len, i
     {
         if (*mantissa_len > MAX_LEN_MANTISSA) 
         {
-            printf("Длина мантиссы превышает 40 символов!\n");
+            printf("Длина мантиссы превышает 30 символов!\n");
             return ERROR_TOO_LONG_MANTISSA;
         }
 
@@ -95,19 +95,15 @@ int mantissa_check(char *input, double_data *data)
     sign_validation(&temp, &data->num_sign);
 
     if (mantissa_before_dot_fill(&temp, data->mantissa, &data->len  ) != 0)
-    {
-        printf("Длина мантиссы превышает 40 символов!\n");
         return ERROR_TOO_LONG_MANTISSA;
-    }
+    
 
     if (*temp == '.')
     {
         temp++;
         if (mantissa_after_dot_fill(&temp, data->mantissa, &data->len, &exp_diff) != 0)
-        {
-            printf("Длина мантиссы превышает 40 символов!\n");
             return ERROR_TOO_LONG_MANTISSA;
-        }
+        
     }
 
     if (*temp == 'e' || *temp == 'E')
@@ -118,12 +114,6 @@ int mantissa_check(char *input, double_data *data)
     }
 
     data->exp = data->exp * data->exp_sign + exp_diff;  
-
-    if (data->len > MAX_LEN_MANTISSA)
-    {
-        printf("Длина мантиссы превышает 40 символов!\n");
-        return ERROR_TOO_LONG_MANTISSA;
-    }
 
     if (abs(data->exp) > 99999)
     {
