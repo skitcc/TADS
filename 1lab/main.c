@@ -10,7 +10,6 @@
 #include <stdlib.h>
 
 
-
 int main(void)
 {
     double_data whole_double_num; 
@@ -19,25 +18,20 @@ int main(void)
 
     char int_num[MAX_LEN_INT_I];
     char double_num[MAX_LEN_DOUBLE_I];
+    short rc, ic, rm, rt;
 
-    // Ввод данных
-    short rc = input(int_num, double_num);
-    if (rc)
+    if ((rc = input(int_num, double_num)))
         return rc;
 
-    short ic = check_int(int_num, &whole_int_num);
-    // printf("int_len : %zu\n", whole_int_num.len);
-    if (ic)
+    if ((ic = check_int(int_num, &whole_int_num)))
         return ic;
 
-    short rm = mantissa_check(double_num, &whole_double_num);
-    if (rm)
+    if ((rm = mantissa_check(double_num, &whole_double_num)))
         return rm;
 
-    // Выполнение умножения
-    multiply(&whole_double_num, &whole_int_num, &whole_result_num);
-    print_result(&whole_result_num);
-    
+    if ((rt = multiply(&whole_double_num, &whole_int_num, &whole_result_num)))
+        return rt;
 
+    print_result(&whole_result_num);
     return 0;
 }

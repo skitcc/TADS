@@ -8,7 +8,7 @@ typedef struct
     int num_sign;
     int mantissa[MAX_LEN_MANTISSA + 1];
     int exp_sign;
-    int exp; // Хранение экспоненты в виде целого числа
+    int exp;
     size_t len;
 } double_data;
 
@@ -25,7 +25,7 @@ typedef struct
     int num_sign;
     int mantissa[MAX_LEN_MANTISS_RESULT_I + 1];
     int exp_sign;
-    int exp; // Хранение экспоненты в виде целого числа
+    int exp;
     size_t len;
 } result_data;
 

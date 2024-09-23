@@ -7,8 +7,6 @@
 #include <stdlib.h>
 
 
-void multiply(double_data *num1, int_data *num2, result_data *result);
-
-
+short multiply(double_data *num1, int_data *num2, result_data *result);
 
 #endif

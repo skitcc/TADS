@@ -15,39 +15,37 @@ static void sign_validation(char **input, int *sign)
     }
     else
     {
-        *sign = 1; // По умолчанию, знак '+'
+        *sign = 1;
     }
 }
 
 // Заполнение целого числа с пропуском незначащих нулей
-int int_fill(char **input, int *int_value, size_t *int_len)
+short int_fill(char **input, int *int_value, size_t *int_len)
 {
-    // Пропуск всех незначащих нулей
     while (**input == '0')
-    {
         (*input)++;
-    }
+    
 
-    // Если после всех нулей ничего не осталось, значит число - это "0"
     if (**input == '\0') 
     {
         int_value[(*int_len)++] = 0;
-        return 0;
+        return EXIT_SUCCESS;
     }
 
-    // Заполнение числа значащими цифрами
     while (**input >= '0' && **input <= '9')
     {
         if (*int_len >= MAX_LEN_INT)
+        {
+            printf("Длина целого числа превышает 40 символов!\n");
             return ERROR_TOO_LONG_INT;
+        }
         int_value[(*int_len)++] = *((*input)++) - '0';
     }
-    return 0; // Успех
+    return EXIT_SUCCESS; 
 }
 
 short check_int(char *input, int_data *new_int)
 {
-    // Регулярное выражение для проверки корректности целого числа
     const char pattern[] = "^[+-]?[0-9]+$";
     regex_t regex;
 
@@ -55,26 +53,20 @@ short check_int(char *input, int_data *new_int)
         return ERROR_MATCHING_REG_EXPR;
 
     if (regexec(&regex, input, 0, NULL, 0) != 0)
+    {
+        printf("Целое число не соответствует формату!\n");
         return ERROR_MATCHING_REG_EXPR;
-
+    }
     char *temp = input;
     new_int->len = 0;
 
-    // Проверка знака числа
     sign_validation(&temp, &new_int->num_sign);
 
-    // Заполнение целого числа с пропуском незначащих нулей
     if (int_fill(&temp, new_int->int_value, &new_int->len) != 0)
+    {
+        printf("Длина целого числа превышает 40 символов!\n");
         return ERROR_TOO_LONG_INT;
+    }
 
-    // Отладочная печать
-    printf("Integer: ");
-    if (new_int->num_sign == -1)
-        printf("-");
-    for (size_t i = 0; i < new_int->len; i++)
-        printf("%d", new_int->int_value[i]);
-
-    printf("\n");
-
-    return 0;  // Успех
+    return EXIT_SUCCESS; 
 }
