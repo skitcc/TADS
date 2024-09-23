@@ -26,7 +26,7 @@ int main(void)
         return rc;
 
     short ic = check_int(int_num, &whole_int_num);
-    printf("int_len : %zu\n", whole_int_num.len);
+    // printf("int_len : %zu\n", whole_int_num.len);
     if (ic)
         return ic;
 

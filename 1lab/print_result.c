@@ -9,6 +9,12 @@ void print_result(result_data *result)
         printf("+");
     }
 
+
+    if (result->len == 0)
+    {
+        printf("0.0 E 1\n");
+        return;
+    }
     // Вывод 0.
     printf("0.");
 
@@ -19,9 +25,6 @@ void print_result(result_data *result)
 
     // Выводим экспоненту
     printf(" E ");
-
-    result->exp *= result->exp_sign;
-    result->exp += result->len;
     // Выводим значение экспоненты
     printf("%d\n", result->exp);
 }

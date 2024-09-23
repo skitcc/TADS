@@ -20,7 +20,7 @@ static void sign_validation(char **input, int *sign)
 }
 
 // Убираем незначащие нули перед точкой
-int mantissa_before_dot_fill(char **input, int *mantissa, size_t *mantissa_len, int *exp)
+int mantissa_before_dot_fill(char **input, int *mantissa, size_t *mantissa_len)
 {
     // Пропускаем ведущие нули перед десятичной точкой
     while (**input == '0')
@@ -36,13 +36,6 @@ int mantissa_before_dot_fill(char **input, int *mantissa, size_t *mantissa_len, 
         
         mantissa[(*mantissa_len)++] = *((*input)++) - '0';
     }
-
-    // Если не было цифр перед точкой, а сразу встретилась точка или конец строки
-    if (*mantissa_len == 0 && **input == '.')
-    {
-        *exp = -1;  // Устанавливаем экспоненту на -1 для чисел, начинающихся с нуля, как 0.XXX
-    }
-
     return 0;
 }
 
@@ -81,6 +74,7 @@ void order_fill(char **input, int *exp)
     {
         *exp = *exp * 10 + (*((*input)++) - '0');
     }
+    // printf("exp_order : %d\n", *exp);
 }
 
 // Основная функция для разбора строки и извлечения мантиссы и экспоненты
@@ -108,7 +102,7 @@ int mantissa_check(char *input, double_data *data)
     sign_validation(&temp, &data->num_sign);
 
     // Обрабатываем часть до точки
-    if (mantissa_before_dot_fill(&temp, data->mantissa, &data->len, &data->exp) != 0)
+    if (mantissa_before_dot_fill(&temp, data->mantissa, &data->len  ) != 0)
         return ERROR_TOO_LONG_MANTISSA;
 
     // Обрабатываем часть после точки
