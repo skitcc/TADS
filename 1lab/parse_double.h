@@ -12,7 +12,8 @@
 
 
 
-int mantissa_check(char *double_num, double_data *data);
+int mantissa_check(char *input, double_data *data);
+
 
 
 

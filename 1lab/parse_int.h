@@ -5,10 +5,11 @@
 #include "struct.h"
 #include <stddef.h>
 #include <ctype.h>
+#include <regex.h>
 
 
 
-short check_int(char *my_int, char *new_int);
+short check_int(char *input, int_data *new_int);
 
 
 #endif

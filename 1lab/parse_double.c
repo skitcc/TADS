@@ -1,110 +1,148 @@
 #include "parse_double.h"
 
-void sign_validation(char sign, int *sign_struct, size_t *input_ind)
+// Проверка знака числа
+static void sign_validation(char **input, int *sign)
 {
-    if (sign == '+')
+    if (**input == '-')
     {
-        sign_struct++;
-        (*input_ind)++;
+        *sign = -1;
+        (*input)++;
     }
-    if (sign == '-')
+    else if (**input == '+')
     {
-        (*input_ind)++;
-        sign_struct--;
+        *sign = 1;
+        (*input)++;
     }
     else
     {
-        sign_struct++;
+        *sign = 1; // По умолчанию, знак '+'
     }
 }
 
-
-void mantissa_before_dot_fill(char *mantissa_input, int *mantissa_struct, size_t *input_ind, size_t *diff)
+// Убираем незначащие нули перед точкой
+int mantissa_before_dot_fill(char **input, int *mantissa, size_t *mantissa_len, int *exp)
 {
-    if (*input_ind > 0)
-        *diff = 1;
-    while (strchr("Ee.\0", mantissa_input[*input_ind]) == NULL)
+    // Пропускаем ведущие нули перед десятичной точкой
+    while (**input == '0')
     {
-        mantissa_struct[*input_ind - *diff] = mantissa_input[(*input_ind)] - '0';
-        printf("%d ", mantissa_input[(*input_ind)] - '0');
-        (*input_ind)++;
+        (*input)++;
     }
-    if (mantissa_input[*input_ind] != '.' || mantissa_input[*input_ind] != '\0')
+
+    // Заполняем значащие цифры перед точкой
+    while (strchr("Ee.\0", **input) == NULL)
     {
-        (*input_ind)++;
-        (*diff)++;
-        return;
+        if (*mantissa_len >= MAX_LEN_MANTISSA)
+            return ERROR_TOO_LONG_MANTISSA;
+        
+        mantissa[(*mantissa_len)++] = *((*input)++) - '0';
     }
+
+    // Если не было цифр перед точкой, а сразу встретилась точка или конец строки
+    if (*mantissa_len == 0 && **input == '.')
+    {
+        *exp = -1;  // Устанавливаем экспоненту на -1 для чисел, начинающихся с нуля, как 0.XXX
+    }
+
+    return 0;
 }
 
-void mantissa_after_dot_fill(char *mantissa_input, int *mantissa_struct, size_t *input_ind, size_t *order_diff, size_t *diff)
+// Убираем конечные нули после точки
+int mantissa_after_dot_fill(char **input, int *mantissa, size_t *mantissa_len, int *exp_diff)
 {
-    while (strchr("Ee\0", mantissa_input[*input_ind]) == NULL)
-    {
+    int last_significant_digit = *mantissa_len; // Последняя значащая цифра
 
-        mantissa_struct[*input_ind - *diff] = mantissa_input[(*input_ind)] - '0';
-        printf("%d ", mantissa_input[(*input_ind)] - '0');
-        (*input_ind)++;
-        (*order_diff)++;
-    }
-    if (mantissa_input[*input_ind] != '\0')
+    while (strchr("Ee\0", **input) == NULL)
     {
-        (*input_ind)++;
-        (*diff)++;
-        return;
+        if (*mantissa_len >= MAX_LEN_MANTISSA) 
+            return ERROR_TOO_LONG_MANTISSA;
+
+        int digit = *((*input)++) - '0';
+        mantissa[(*mantissa_len)++] = digit;
+        (*exp_diff)--;  // Уменьшаем exp_diff для каждой цифры после точки
+
+        if (digit != 0)
+            last_significant_digit = *mantissa_len; // Обновляем последнюю значащую цифру
     }
+
+    // Удаляем конечные нули
+    *mantissa_len = last_significant_digit;
+
+    return 0;
 }
 
-void order_fill(char *order_input, int *order_struct, size_t *input_ind)
+// Заполнение порядка (экспоненты)
+void order_fill(char **input, int *exp)
 {
-    size_t i = 0;
-    while(strchr("\0", order_struct[*input_ind]) == NULL)
+    *exp = 0;  // Инициализируем экспоненту
+
+
+    // Обрабатываем цифры экспоненты
+    while (**input != '\0' && **input >= '0' && **input <= '9')
     {
-        printf("here :  %d ", order_input[(*input_ind)] - '0');
-        order_struct[i++] = order_input[(*input_ind)] - '0';
-        (*input_ind)++;
+        *exp = *exp * 10 + (*((*input)++) - '0');
     }
 }
 
+// Основная функция для разбора строки и извлечения мантиссы и экспоненты
 int mantissa_check(char *input, double_data *data)
 {
     const char pattern[] = "^[+-]?([0-9]+([.][0-9]*)?([eE][+-]?[0-9]+)?|[.][0-9]+([eE][+-]?[0-9]+)?)$";
     regex_t regex;
 
-    regcomp(&regex, pattern, REG_EXTENDED);
-
-    if (regexec(&regex, input, 0, 0, 0) != 0)
+    // Проверка регулярного выражения
+    if (regcomp(&regex, pattern, REG_EXTENDED) != 0)
         return ERROR_MATCHING_REG_EXPR;
 
-    size_t input_ind = 0;
-    size_t order_diff = 0;
-    size_t diff_sign = 0;
-    sign_validation(input[input_ind], &data->num_sign, &input_ind);
-    mantissa_before_dot_fill(input, data->mantissa, &input_ind, &diff_sign);
-    mantissa_after_dot_fill(input, data->mantissa, &input_ind, &order_diff, &diff_sign);
+    if (regexec(&regex, input, 0, NULL, 0) != 0)
+        return ERROR_MATCHING_REG_EXPR;
 
+    char *temp = input;
+    data->len = 0;
+    int exp_diff = 0;  // Разница порядка после точки
 
-    printf("diff_sign : %zu\n", diff_sign);
-    size_t len_mantiss = input_ind - diff_sign;
-    if (len_mantiss > MAX_LEN_MANTISSA)
+    // Инициализация экспоненты
+    data->exp = 0;
+    data->exp_sign = 1;  // Инициализируем знак экспоненты как положительный
+
+    // Проверка знака числа
+    sign_validation(&temp, &data->num_sign);
+
+    // Обрабатываем часть до точки
+    if (mantissa_before_dot_fill(&temp, data->mantissa, &data->len, &data->exp) != 0)
         return ERROR_TOO_LONG_MANTISSA;
 
-
-    sign_validation(input[input_ind], &data->exp_sign, &input_ind);
-    int len_order = (int)input_ind;
-    
-    order_fill(input, data->order, &input_ind);
-    len_order -= input_ind;
-    printf("len_order : %d\n", len_order);
-
-    printf("len_mantiss : %zu\n", len_mantiss);
-    for (size_t i = 0; i < len_mantiss; i++)
+    // Обрабатываем часть после точки
+    if (*temp == '.')
     {
-        printf("%d ", data->mantissa[i]);
+        temp++;
+        if (mantissa_after_dot_fill(&temp, data->mantissa, &data->len, &exp_diff) != 0)
+            return ERROR_TOO_LONG_MANTISSA;
     }
 
-    // printf("order : %d\n", data->order);
-    printf("\n");
-    return 0;
+    // Обработка экспоненты (если есть)
+    if (*temp == 'e' || *temp == 'E')
+    {
+        temp++;
+        sign_validation(&temp, &data->exp_sign);
+        order_fill(&temp, &data->exp);
+    }
 
+    // Корректировка экспоненты
+    data->exp = data->exp * data->exp_sign + exp_diff;  // Корректируем экспоненту с учетом разницы порядка после точки
+
+    // Проверка длины мантиссы
+    if (data->len > MAX_LEN_MANTISSA)
+        return ERROR_TOO_LONG_MANTISSA;
+
+    // Проверка величины экспоненты
+    if (abs(data->exp) > 99999)
+        return TOO_LONG_EXP;
+
+    // Отладочная информация
+    printf("Mantissa: ");
+    for (size_t i = 0; i < data->len; i++)
+        printf("%d", data->mantissa[i]);
+
+    printf("\nExp: %d\n", data->exp);
+    return 0;
 }

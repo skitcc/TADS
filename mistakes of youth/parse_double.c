@@ -1,6 +1,3 @@
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "parse_double.h"
 
 // Вставка символа в начало строки
