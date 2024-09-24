@@ -53,9 +53,9 @@ int mantissa_after_dot_fill(char **input, int *mantissa, size_t *mantissa_len, i
         int digit = *((*input)++) - '0';
         mantissa[(*mantissa_len)++] = digit;
         (*exp_diff)--; 
-
         if (digit != 0)
             last_significant_digit = *mantissa_len; 
+
     }
 
     *mantissa_len = last_significant_digit;
@@ -68,7 +68,11 @@ void order_fill(char **input, int *exp)
 {
     *exp = 0;
     while (**input != '\0' && **input >= '0' && **input <= '9')
-        *exp = *exp * 10 + (*((*input)++) - '0');
+    {
+        printf("input : %c\n", *(*input));
+        if (*(*input) != '0')
+            *exp = *exp * 10 + (*((*input)++) - '0');
+    }
 }
 
 // Основная функция для разбора строки и извлечения мантиссы и экспоненты
@@ -114,11 +118,16 @@ int mantissa_check(char *input, double_data *data)
     }
 
     data->exp = data->exp * data->exp_sign + exp_diff;  
+    printf("exp : %d", data->exp);
 
-    if (abs(data->exp) > 99999)
-    {
-        printf("Значение порядка превышает 99999\n");
-        return ERROR_TOO_LARGE_EXP;
-    }
+    // if (abs(data->exp) > 99999)
+    // {
+    //     printf("Значение порядка превышает 99999\n");
+    //     return ERROR_TOO_LARGE_EXP;
+    // }
+
+
+
+    printf("\n");
     return EXIT_SUCCESS;
 }

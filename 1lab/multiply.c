@@ -24,7 +24,6 @@ void round_mantissa(int *result_mas, size_t *len_arr, int *exp)
 {
     if (*len_arr > SIZE_MANTISSA) 
     {
-        printf("here\n");
         size_t last_digit_pos = SIZE_MANTISSA;
 
         if (result_mas[last_digit_pos] >= 5) 
@@ -78,6 +77,7 @@ void multiply_mantissas(double_data *num1, int_data *num2, result_data *result)
         mas_of_sums[i] = temp % 10;
         carry = temp / 10;
     }
+    printf("\ncarry : %d\n", carry);
     if (carry > 10)
     {
         int temp = mas_of_sums[len1 + len2 - 1] + carry;
@@ -92,14 +92,25 @@ void multiply_mantissas(double_data *num1, int_data *num2, result_data *result)
         carry /= 10;
         result->exp++;
     }
+    reverse_array(mas_of_sums, result_len);
 
     while (result_len > 1 && mas_of_sums[result_len - 1] == 0)
+    {
+        printf("digit : %d\n",mas_of_sums[result_len - 1]);
         result_len--;
-
+    }
     for (size_t i = 0; i < result_len; i++)
         result->mantissa[i] = mas_of_sums[i];
 
-    reverse_array(result->mantissa, result_len);
+    printf("result_len : %zu\n", result_len);
+    for (size_t i = 0; i < result_len; i++)
+    {
+        printf("%d ", result->mantissa[i]);
+    }
+    printf("\n");
+
+
+    // reverse_array(result->mantissa, result_len);
     round_mantissa(result->mantissa, &result_len, &result->exp);
 
     result->len = result_len;  
@@ -109,12 +120,14 @@ void multiply_mantissas(double_data *num1, int_data *num2, result_data *result)
         result->mantissa[0] /= 10;
         result->exp++;  
     }
+    printf("exp_upd : %d\n", result->exp);
 }
 
 
 // Корректировка порядка экспоненты
 void adjust_exponent(double_data *num1, int_data *num2, result_data *result)
 {
+    printf("exp : %d,num1->len : %zu, num2->len - 1 : %zu\n", num1->exp, num1->len, num2->len - 1);
     int total_exp = num1->exp + num1->len + (num2->len - 1);
     result->exp_sign = (total_exp >= 0) ? 1 : -1;
     result->exp += total_exp;
