@@ -47,8 +47,9 @@ int compare_keys(const void *a, const void *b)
     return (x->rooms_quantity - y->rooms_quantity);
 }
 
-int bubble_sort_structs(desc_t *array, int n)
+int bubble_sort_structs(desc_t *array, int n, bool *is_sorted)
 {
+    *is_sorted = true;
     return bubble_sort_generic(array, n, sizeof(desc_t), compare_structs);
 }
 
@@ -69,8 +70,9 @@ int qsort_generic(void *array, int n, size_t size, int (*cmp)(const void *, cons
 }
 
 
-int qsort_structs(desc_t *array, int n)
+int qsort_structs(desc_t *array, int n, bool *is_sorted)
 {
+    *is_sorted = true;
     return qsort_generic(array, n, sizeof(desc_t), compare_structs);
 }
 

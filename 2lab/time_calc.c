@@ -28,7 +28,7 @@ int compare_sorts()
     desc_t array_copy[MAX_SIZE_ARRAY];
     keys_t keys[MAX_SIZE_ARRAY];
     keys_t keys_copy[MAX_SIZE_ARRAY];
-
+    bool is_sorted = false;
     int n = 0;  
     int rc = load_data(array, &n, keys);  
     if (rc != 0)
@@ -41,7 +41,7 @@ int compare_sorts()
     puts("|----------------------------------------------------------------------------------|");
 
     start1 = tick_count();
-    bubble_sort_structs(array, n);  
+    bubble_sort_structs(array, n, &is_sorted);  
     end1 = tick_count();
 
     printf("| Сортировка таблицы пузырьком         |");
@@ -63,7 +63,7 @@ int compare_sorts()
     }
 
     start2 = tick_count();
-    qsort_structs(array, n);  
+    qsort_structs(array, n, &is_sorted);  
     end2 = tick_count();
 
     printf("| Сортировка таблицы qsort             |");

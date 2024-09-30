@@ -26,6 +26,8 @@ int main(void)
     }
 
     int code_return = 0;
+    int sub_code = 0;
+    bool is_sorted = false;
     
     while (mode)  
     {
@@ -50,15 +52,33 @@ int main(void)
                 code_return = print_task_version(arr, quantity_of_structs);
                 break;
             case 6:
-                code_return = bubble_sort_structs(arr, quantity_of_structs);
+                code_return = bubble_sort_structs(arr, quantity_of_structs, &is_sorted);
                 break;
             case 7:
-                code_return = qsort_structs(arr, quantity_of_structs);
+                code_return = qsort_structs(arr, quantity_of_structs, &is_sorted);
                 break;
             case 8:
                 code_return = qsort_keys(keys, quantity_of_structs);
-                print_keys(keys, quantity_of_structs);
-                print_struct(arr, quantity_of_structs);
+                if (is_sorted)
+                {
+                    printf("Выполнение опции невозможно, таблица уже отсортирована, перезапустите программу!\n");
+                    break;
+                }
+                if (!code_return)
+                    print_keys(keys, quantity_of_structs);
+                else
+                    break;
+                printf("Хотите увидеть неотсортированную таблицу?(y/n)\n");
+                getchar();
+                char sub_option = 0;
+                if ((sub_code = !scanf("%c", &sub_option)))
+                    printf("Ошибка ввода подопции для вывода неотсортированной таблицы!\n");
+                if (sub_option == 'y')
+                    print_struct(arr, quantity_of_structs);
+                else if (sub_option == 'n')
+                    printf("Отказ вывода\n");
+                else
+                    printf("Введена неправильная подопция!\n");
                 break;
             case 9:
                 code_return = qsort_keys(keys, quantity_of_structs);
@@ -71,7 +91,7 @@ int main(void)
                 printf("Выбранная опция недоступна!\n");
         }
 
-        if (code_return) {
+        if (code_return || sub_code) {
             printf("%sПри выполнении опции произошла ошибка!%s\n", RED, RESET);
         }
 

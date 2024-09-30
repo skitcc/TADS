@@ -10,7 +10,7 @@ int validate_year(char *year)
 
     if (regexec(&regex, year, 0, NULL, 0) != 0)
     {
-        printf("Год не соответствует формату\n");
+        printf("Год не соответствует формату!\n");
         return ERROR_MATCHING_REG_EXPR;
     }
     return 0;
@@ -31,7 +31,7 @@ int read_one_record(desc_t *record, FILE *f_in, short mode)
         return ERROR_READING_TYPE_ROOM;
     }
     if (mode)
-        printf("Введите адрес квартиры\n");
+        printf("Введите адрес квартиры без пробелов!\n");
     
     if (!fscanf(f_in, "%s", record->address))
     {
@@ -39,7 +39,7 @@ int read_one_record(desc_t *record, FILE *f_in, short mode)
         return ERROR_READING_ADDRESS;
     }
     if (mode)
-        printf("Введите площадь квартиры в кв.м\n");
+        printf("Введите площадь квартиры в кв.м (целое/вещественное) число\n");
 
     if (!fscanf(f_in, "%f", &record->area) || record->area < 0)
     {
@@ -47,7 +47,7 @@ int read_one_record(desc_t *record, FILE *f_in, short mode)
         return ERROR_READING_SQUARE;
     }
     if (mode)
-        printf("Введите кол-во комнат\n");
+        printf("Введите кол-во комнат (целое число)\n");
 
     if (!fscanf(f_in, "%d", &record->rooms_quantity))
     {
@@ -103,13 +103,13 @@ int read_one_record(desc_t *record, FILE *f_in, short mode)
 
         if (!fscanf(f_in, "%hd", &record->type.second.is_pet))
         {
-            printf("Ошибка чтения питомцев\n");
+            printf("Ошибка чтения питомцев!\n");
             return ERROR_READING_PETS;
         }  
 
         if (record->type.second.is_pet < 0 || record->type.second.is_pet > 1)
         {
-            printf("Ошибка значения питомцев\n");
+            printf("Значение питомцев может быть 0 или 1!\n");
             return ERROR_VALUE_PETS;
         }
 

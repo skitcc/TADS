@@ -16,33 +16,6 @@ void show_options(void)
 
 }
 
-int print_task_version(desc_t *arr, int n)
-{
-    float start = 0, end = 0;
-    printf("Введите начало ценового диапазона за кв.м\n");
-    if (!scanf("%f", &start))
-        return 1;
-
-    printf("Введите конец ценового диапазона за кв.м\n");
-    if (!scanf("%f", &end))
-        return 2;
-
-    int counter = 0;
-    for (int i = 0; i < n; i++)
-    {
-        if (arr[i].square_cost >= start && arr[i].square_cost <= end && !arr[i].type.second.is_pet && !strcmp(arr[i].type_room, "secondary") && arr[i].rooms_quantity == 2)
-        {
-            printf("Type : %s, Address : %s, Area : %f, Quantity : %d, Cost : %f, Year : %s, Citiz : %d, Pets : %d\n", arr[i].type_room,  arr[i].address, arr[i].area, arr[i].rooms_quantity, arr[i].square_cost, arr[i].type.second.build_year, arr[i].type.second.quantity_prev_owners, arr[i].type.second.is_pet);
-            counter++;
-        }
-    
-    }
-    if (!counter)
-        printf("%s Не найдено ни одного элемента в таком целовом диапазоне и без животных%s\n", RED, RESET);
-    
-    return 0;
-}
-
 void print_record_key(keys_t key)
 {
     printf("|%3d|%17d|\n", key.index + 1, key.rooms_quantity);
@@ -110,7 +83,7 @@ void print_one_record(desc_t room)
         printf("|");
         print_centered_float(room.square_cost, 18);            
         printf("|");
-        print_centered_string(room.type.prime.trim ? "Есть" : "Нет", 18); 
+        print_centered_string(room.type.prime.trim ? "Есть" : "Нету", 18); 
         printf("|");
         print_centered_string("N/A", 17);                             
         printf("|");
@@ -161,4 +134,32 @@ void print_structs_by_keys(desc_t *arr, keys_t *keys, int n)
         print_one_record(arr[keys[i].index]);
     }
     footer();
+}
+
+int print_task_version(desc_t *arr, int n)
+{
+    float start = 0, end = 0;
+    printf("Введите начало ценового диапазона за кв.м\n");
+    if (!scanf("%f", &start))
+        return 1;
+
+    printf("Введите конец ценового диапазона за кв.м\n");
+    if (!scanf("%f", &end))
+        return 2;
+    header();
+    int counter = 0;
+    for (int i = 0; i < n; i++)
+    {
+        if (arr[i].square_cost >= start && arr[i].square_cost <= end && !arr[i].type.second.is_pet && !strcmp(arr[i].type_room, "secondary") && arr[i].rooms_quantity == 2)
+        {
+            print_one_record(arr[i]);
+            counter++;
+        }
+    
+    }
+    footer();
+    if (!counter)
+        printf("%s Не найдено ни одного элемента в таком целовом диапазоне и без животных%s\n", RED, RESET);
+    
+    return 0;
 }
