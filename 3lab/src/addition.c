@@ -86,7 +86,6 @@ CSRMatrixResult add_std_matrices(const CSRMatrix *matrix1, const CSRMatrix *matr
         return result;
     }
 
-    // Результирующая матрица
     CSRMatrix *result_matrix = &result.matrix;
     result_matrix->rows = matrix1->rows;
     result_matrix->cols = matrix1->cols;
@@ -99,14 +98,12 @@ CSRMatrixResult add_std_matrices(const CSRMatrix *matrix1, const CSRMatrix *matr
 
     int current_a = 0;
 
-    // Итерация по строкам и столбцам
     for (int i = 0; i < result_matrix->rows; i++) {
         result_matrix->IA[i] = current_a;
 
         for (int j = 0; j < result_matrix->cols; j++) {
             int value = 0;
 
-            // Получаем элемент из первой матрицы
             for (int idx1 = matrix1->IA[i]; idx1 < matrix1->IA[i + 1]; idx1++) {
                 if (matrix1->JA[idx1] == j) {
                     value += matrix1->A[idx1];
@@ -114,7 +111,6 @@ CSRMatrixResult add_std_matrices(const CSRMatrix *matrix1, const CSRMatrix *matr
                 }
             }
 
-            // Получаем элемент из второй матрицы
             for (int idx2 = matrix2->IA[i]; idx2 < matrix2->IA[i + 1]; idx2++) {
                 if (matrix2->JA[idx2] == j) {
                     value += matrix2->A[idx2];
@@ -122,7 +118,6 @@ CSRMatrixResult add_std_matrices(const CSRMatrix *matrix1, const CSRMatrix *matr
                 }
             }
 
-            // Если результат ненулевой, сохраняем его в CSR
             if (value != 0) {
                 extend_if_needed(result_matrix, &capacity, current_a);
                 result_matrix->A[current_a] = value;

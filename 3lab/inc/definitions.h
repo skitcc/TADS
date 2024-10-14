@@ -17,5 +17,6 @@
 #define ERR_COLS 6
 #define ERR_COORDS 7
 #define ERR_NOT_EQUAL_SIZES 8
+#define ERR_WRONG_OPTION 9
 
 #endif

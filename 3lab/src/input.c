@@ -14,10 +14,10 @@ int input_matrix(CSRMatrix *matrix) {
         return rc;
     else if (variant_input != '1' && variant_input != '0') {
         printf("%sНеправильная опция ввода матрицы!%s\n", RED, RESET);
-        return 2;
+        return ERR_WRONG_OPTION;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 int check_args(int *rows, int *cols)
@@ -25,6 +25,7 @@ int check_args(int *rows, int *cols)
     printf("Введите кол-во строк и столбцов для матрицы\n");
     if (scanf("%d%d", rows, cols) != 2)
     {
+        while (getchar() != '\n');
         return ERR_INPUT;
     }
     if (*cols < 0 || *rows < 0)
@@ -50,7 +51,7 @@ int input_std_matrix(CSRMatrix *matrix)
     int rc;
     if ((rc = check_args(&matrix->rows, &matrix->cols)))
         return rc;
-
+    
     int capacity = 10;
 
     matrix->A = (int *)malloc(capacity * sizeof(int));
@@ -60,7 +61,7 @@ int input_std_matrix(CSRMatrix *matrix)
 
     int current_a = 0;
     matrix->IA[0] = 0;
-
+    printf("Введите значения для матрицы, %d - строк, %d - столбцов\n", matrix->rows, matrix->cols);
     for (int i = 0; i < matrix->rows; i++)
     {
         for (int j = 0; j < matrix->cols; j++)
@@ -80,7 +81,7 @@ int input_std_matrix(CSRMatrix *matrix)
         matrix->IA[i + 1] = current_a;
     }
     matrix->nnz = current_a;
-    return 0;
+    return EXIT_SUCCESS;
     
 }
 
@@ -88,7 +89,6 @@ int input_coord_matrix(CSRMatrix *matrix) {
     int capacity = 10;
     int rc;
 
-    // Запрашиваем количество строк и столбцов
     if ((rc = check_args(&matrix->rows, &matrix->cols)))
         return rc;
 
@@ -99,14 +99,11 @@ int input_coord_matrix(CSRMatrix *matrix) {
     if (total_nnz < 0 || total_nnz > matrix->rows * matrix->cols)
         return ERR_NZE;
 
-    // Выделяем память для A, JA и IA
     matrix->A = (int *)malloc(capacity * sizeof(int));
     matrix->JA = (int *)malloc(capacity * sizeof(int));
     matrix->IA = (int *)calloc((matrix->rows + 1), sizeof(int));
 
     int current_a = 0;
-
-    // Временный массив для подсчета количества ненулевых элементов в каждой строке
     int *row_nnz = (int *)calloc(matrix->rows, sizeof(int));
 
     for (int i = 0; i < total_nnz; i++) {
@@ -118,29 +115,23 @@ int input_coord_matrix(CSRMatrix *matrix) {
         if (row < 0 || row >= matrix->rows || col < 0 || col >= matrix->cols)
             return ERR_COORDS;
 
-        if (value) {
-            // Увеличиваем массивы, если нужно
+        if (value) 
+        {
             extend_if_needed(matrix, &capacity, current_a);
 
-            // Заполняем A и JA
             matrix->A[current_a] = value;
             matrix->JA[current_a] = col;
             current_a++;
-
-            // Увеличиваем счетчик ненулевых элементов в строке
             row_nnz[row]++;
         }
     }
 
-    // Построение массива IA
-    for (int i = 1; i <= matrix->rows; i++) {
+    for (int i = 1; i <= matrix->rows; i++) 
         matrix->IA[i] = matrix->IA[i - 1] + row_nnz[i - 1];
-    }
 
-    // Освобождаем временный массив
     free(row_nnz);
 
     matrix->nnz = current_a;
 
-    return 0;
+    return EXIT_SUCCESS;
 }

@@ -35,7 +35,7 @@ int main() {
         switch (mode) 
         {
             case 1:
-                printf("Введите первую матрицу\n");
+                printf("%sВведите первую матрицу%s\n", YELLOW, RESET);
                 if (input_matrix(&matrix1)) 
                 {
                     printf("%sОшибка ввода первой матрицы!%s\n", RED, RESET);

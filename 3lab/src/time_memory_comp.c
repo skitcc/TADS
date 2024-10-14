@@ -7,7 +7,7 @@ void compare_algorithms(int rows, int cols, int fill_percentage)
     CSRMatrix matrix1, matrix2;
     int **dense_matrix1 = create_dense_matrix(rows, cols, fill_percentage);
 
-    printf(GREEN "Матрица 1\n" RESET);
+    printf("%sМатрица 1, %d строк, %d столбцов, %d%% заполнение %s\n",GREEN,rows,cols,fill_percentage, RESET);
     convert_to_csr(dense_matrix1, rows, cols, &matrix1);
     
     int option = 0;
@@ -24,7 +24,7 @@ void compare_algorithms(int rows, int cols, int fill_percentage)
         return;
 
     int **dense_matrix2 = create_dense_matrix(rows, cols, fill_percentage);
-    printf(GREEN "Матрица 2\n" RESET);
+    printf("%sМатрица 2, %d строк, %d столбцов, %d%% заполнение %s\n",GREEN,rows,cols,fill_percentage, RESET);
     convert_to_csr(dense_matrix2, rows, cols, &matrix2);
 
     printf(BLUE "Просмотр матрицы (0 - нет, 1 - да)\n" RESET);

@@ -5,12 +5,12 @@
 #include <stdlib.h>
 
 typedef struct {
-    int *A;   // Ненулевые элементы
-    int *JA;  // Индексы столбцов ненулевых элементов
-    int *IA;  // Индексы начала строк
-    int rows; // Количество строк
-    int cols; // Количество столбцов
-    int nnz;  // Количество ненулевых элементов
+    int *A;  
+    int *JA;  
+    int *IA;  
+    int rows; 
+    int cols; 
+    int nnz;  
 } CSRMatrix;
 
 typedef struct {
@@ -19,9 +19,9 @@ typedef struct {
 } CSRMatrixResult;
 
 typedef struct {
-    int rows;      // Количество строк
-    int cols;      // Количество столбцов
-    int percent;   // Процент заполнения
+    int rows;      
+    int cols;      
+    int percent;   
 } MatrixParams;
 
 
