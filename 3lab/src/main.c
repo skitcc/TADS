@@ -132,7 +132,8 @@ int main() {
 
                 for (int i = 0; i < n; i++) {
                     printf("Введите параметры для матриц %d (строки, столбцы, процент заполнения): ", i + 1);
-                    if (scanf("%d %d %d", &matrices[i].rows, &matrices[i].cols, &matrices[i].percent) != 3) {
+                    if (scanf("%d %d %d", &matrices[i].rows, &matrices[i].cols, &matrices[i].percent) != 3) 
+                    {
                         printf("%sОшибка ввода параметров матрицы!%s\n", RED, RESET);
                         free(matrices);
                         return 1;
