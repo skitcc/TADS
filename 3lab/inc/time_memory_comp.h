@@ -12,7 +12,7 @@
 #include <inttypes.h>
 
 #define GHZ 2.5 
-#define REPEAT_COUNT 100
+#define REPEAT_COUNT 1000
 
 
 void compare_algorithms(int rows, int cols, int fill_percentage);

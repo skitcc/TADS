@@ -77,8 +77,8 @@ CSRMatrixResult add_csr_matrices(const CSRMatrix *matrix1, const CSRMatrix *matr
     return result;
 }
 
-CSRMatrixResult add_std_matrices(const CSRMatrix *matrix1, const CSRMatrix *matrix2) {
-
+CSRMatrixResult add_std_matrices(const CSRMatrix *matrix1, const CSRMatrix *matrix2) 
+{
     CSRMatrixResult result = { .error_code = 0 };
     if (matrix1->rows != matrix2->rows || matrix1->cols != matrix2->cols) {
         printf("Ошибка: матрицы должны быть одинакового размера для сложения!\n");
@@ -96,38 +96,71 @@ CSRMatrixResult add_std_matrices(const CSRMatrix *matrix1, const CSRMatrix *matr
     result_matrix->JA = (int *)malloc(capacity * sizeof(int));
     result_matrix->IA = (int *)calloc((result_matrix->rows + 1), sizeof(int));
 
+    if (result_matrix->A == NULL || result_matrix->JA == NULL || result_matrix->IA == NULL) 
+    {
+        result.error_code = ERR_ALLOCATION;
+        return result;
+    }
+
     int current_a = 0;
 
     for (int i = 0; i < result_matrix->rows; i++) {
         result_matrix->IA[i] = current_a;
 
-        for (int j = 0; j < result_matrix->cols; j++) {
-            int value = 0;
-
-            for (int idx1 = matrix1->IA[i]; idx1 < matrix1->IA[i + 1]; idx1++) {
-                if (matrix1->JA[idx1] == j) {
-                    value += matrix1->A[idx1];
-                    break;
+        int idx1 = matrix1->IA[i];
+        int idx2 = matrix2->IA[i];
+        
+        // Оптимизированный обход элементов матриц
+        while (idx1 < matrix1->IA[i + 1] && idx2 < matrix2->IA[i + 1]) {
+            if (matrix1->JA[idx1] == matrix2->JA[idx2]) {
+                int value = matrix1->A[idx1] + matrix2->A[idx2];
+                if (value != 0) {
+                    extend_if_needed(result_matrix, &capacity, current_a);
+                    result_matrix->A[current_a] = value;
+                    result_matrix->JA[current_a] = matrix1->JA[idx1];
+                    current_a++;
                 }
-            }
-
-            for (int idx2 = matrix2->IA[i]; idx2 < matrix2->IA[i + 1]; idx2++) {
-                if (matrix2->JA[idx2] == j) {
-                    value += matrix2->A[idx2];
-                    break;
-                }
-            }
-
-            if (value != 0) {
+                idx1++;
+                idx2++;
+            } else if (matrix1->JA[idx1] < matrix2->JA[idx2]) {
                 extend_if_needed(result_matrix, &capacity, current_a);
-                result_matrix->A[current_a] = value;
-                result_matrix->JA[current_a] = j;
+                result_matrix->A[current_a] = matrix1->A[idx1];
+                result_matrix->JA[current_a] = matrix1->JA[idx1];
                 current_a++;
+                idx1++;
+            } else {
+                extend_if_needed(result_matrix, &capacity, current_a);
+                result_matrix->A[current_a] = matrix2->A[idx2];
+                result_matrix->JA[current_a] = matrix2->JA[idx2];
+                current_a++;
+                idx2++;
             }
         }
+
+        // Добавляем оставшиеся элементы из matrix1
+        while (idx1 < matrix1->IA[i + 1]) {
+            extend_if_needed(result_matrix, &capacity, current_a);
+            result_matrix->A[current_a] = matrix1->A[idx1];
+            result_matrix->JA[current_a] = matrix1->JA[idx1];
+            current_a++;
+            idx1++;
+        }
+
+        // Добавляем оставшиеся элементы из matrix2
+        while (idx2 < matrix2->IA[i + 1]) {
+            extend_if_needed(result_matrix, &capacity, current_a);
+            result_matrix->A[current_a] = matrix2->A[idx2];
+            result_matrix->JA[current_a] = matrix2->JA[idx2];
+            current_a++;
+            idx2++;
+        }
     }
+    
     result_matrix->IA[result_matrix->rows] = current_a;
     result_matrix->nnz = current_a;
 
     return result;
 }
+
+
+
