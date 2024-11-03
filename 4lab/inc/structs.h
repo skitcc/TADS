@@ -24,6 +24,12 @@ typedef struct
     struct list_stack_t *next;
 } list_stack_t;
 
+typedef struct 
+{
+    char *removed_addresses[MAX_REMOVED];
+    int count;
+} removed_addresses_tracker_t;
+
 
 typedef enum { STATIC_ARRAY, DYNAMIC_ARRAY, LIST } stack_type_t;
 

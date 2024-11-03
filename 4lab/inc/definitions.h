@@ -15,6 +15,7 @@
 #define MAX_LEN_STACK 1000
 #define MAX_LEN_EXPR 1000
 #define INITIAL_CAPACITY 100
+#define MAX_REMOVED 1000
 
 #define ERR_INPUT 1
 #define ERR_OVERFLOW 2
