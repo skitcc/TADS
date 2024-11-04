@@ -8,12 +8,11 @@ void init_static_array_stack(static_array_stack_t *s)
 }
 
 // Инициализация динамического стека
-void init_dynamic_array_stack(dynamic_array_stack_t *s) 
+void init_dynamic_array_stack(dynamic_array_stack_t *s, int size) 
 {
     s->top = -1;
-    s->capacity = 1000;
     // printf("Инициализация стека: выделение %d байт памяти.\n", s->capacity * (int)sizeof(char));
-    s->data = (char *)malloc(s->capacity * sizeof(char));
+    s->data = (char *)malloc((size_t)size * sizeof(char));
     if (s->data == NULL) {
         printf("%sОшибка выделения памяти для динамического стека.%s\n", RED, RESET);
     }
@@ -23,13 +22,6 @@ void init_dynamic_array_stack(dynamic_array_stack_t *s)
 list_stack_t *init_list_stack() 
 {
     return NULL;
-}
-
-// Функция для инициализации стеков
-void initialize_stacks(static_array_stack_t *st_arr_stack, dynamic_array_stack_t *dn_arr_stack, list_stack_t **list_stack) {
-    init_static_array_stack(st_arr_stack);
-    init_dynamic_array_stack(dn_arr_stack);
-    *list_stack = init_list_stack();
 }
 
 // Функция для заполнения стека из выражения

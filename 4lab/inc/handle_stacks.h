@@ -8,14 +8,15 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 
 
 void initialize_stacks(static_array_stack_t *st_arr_stack, dynamic_array_stack_t *dn_arr_stack, list_stack_t **list_stack);
 void fill_stack_from_expression(const char *expr, void *stack, stack_type_t type);
-void handle_static_stack(static_array_stack_t *st_arr_stack, char *expr);
-void handle_dynamic_stack(dynamic_array_stack_t *dn_arr_stack, char *expr);
-void handle_list_stack(list_stack_t *list_stack, char *expr);
+void handle_static_stack();
+void handle_dynamic_stack();
+void handle_list_stack();
 
 
 

@@ -10,26 +10,8 @@
 
 int main() 
 {
-    static_array_stack_t st_arr_stack;
-    dynamic_array_stack_t dn_arr_stack;
-    list_stack_t *list_stack = NULL;
-
-    
-    
-    char expr[MAX_LEN_EXPR + 1];
-    int rc;
-    if ((rc = read_expr(expr))) {
-        return rc;
-    }
-
     int mode = 1;
     char section = '-';
-
-    // push_list(&list_stack, '{');
-    // push_list(&list_stack, '}');
-    // push_list(&list_stack, '(');
-
-    // print_stack(list_stack, LIST);
     
     while (mode) {
         getchar();
@@ -43,20 +25,18 @@ int main()
             printf("%sОшибка ввода опции!%s\n", RED, RESET);
             continue;
         }
-        if (section != 't')
-            initialize_stacks(&st_arr_stack, &dn_arr_stack, &list_stack);
         
         switch (section) {
             case 'a': {
-                handle_static_stack(&st_arr_stack, expr);
+                handle_static_stack();
                 break;
             }
             case 'b': {
-                handle_dynamic_stack(&dn_arr_stack, expr);
+                handle_dynamic_stack();
                 break;
             }
             case 'c': {
-                handle_list_stack(list_stack, expr);
+                handle_list_stack();
                 break;
             }
             case 't': {
