@@ -44,6 +44,7 @@ void compare_time(int size)
 {
     static_array_stack_t st_stack;
     dynamic_array_stack_t dn_stack;
+    list_stack_t *li_stack = NULL;
 
     uint64_t avg_st = 0, avg_dn = 0, avg_li = 0;
     const char *expr = generate_balanced_parentheses(size);
@@ -53,7 +54,7 @@ void compare_time(int size)
     {
         init_static_array_stack(&st_stack);
         uint64_t start_tick = tick_count();
-        check_brackets((void *)&st_stack, STATIC_ARRAY, expr);
+        check_brackets_st(&st_stack, STATIC_ARRAY, expr);
         uint64_t end_tick = tick_count();
         avg_st += (end_tick - start_tick);
     }
@@ -68,7 +69,7 @@ void compare_time(int size)
         // Измерение времени выполнения функции
         init_dynamic_array_stack(&dn_stack, size);
         uint64_t start_tick = tick_count();
-        check_brackets((void *)&dn_stack, DYNAMIC_ARRAY, expr);
+        check_brackets_dn(&dn_stack, DYNAMIC_ARRAY, expr);
         uint64_t end_tick = tick_count();
         avg_dn += (end_tick - start_tick);
         free_dynamic_array_stack(&dn_stack);
@@ -77,17 +78,21 @@ void compare_time(int size)
     avg_dn /= 1000;
     printf("Время выполнения проверки правильности расстановки скобок для стека на динамическом массиве (размер : %d):\n", size);
     printf(YELLOW "Такты: %" PRIu64 "\n" RESET, avg_dn);
-
+    // printf("Средняя память, используемая списком: %zu байт\n", sizeof);
+    // int total_list_memory = 0;
     for (int i = 0; i < 1000; i++) {
+        li_stack = init_list_stack();
         uint64_t start_tick = tick_count();
-        check_brackets_list(expr);
+        check_brackets_list(&li_stack,expr);
         uint64_t end_tick = tick_count();
         avg_li += (end_tick - start_tick);
+        // int total_list_memory = calculate_list_memory(li_stack);
     }
     avg_li /= 1000;
-
+    
     printf("Время выполнения проверки правильности расстановки скобок для стека на списке(размер : %d):\n", size);
     printf(YELLOW "Такты: %" PRIu64 "\n" RESET, avg_li);
+    // printf("Средняя память, используемая списком: %zu байт\n", total_list_memory);
     // free(expr);
  
 

@@ -24,18 +24,17 @@ void handle_static_stack()
             }
             case 2: {
                 char element;
-                printf("Введите элемент для добавления: ");
-                if (scanf(" %c", &element) == 1) {
-                    if (push(&st_arr_stack, STATIC_ARRAY, element) == 0) {
-                        printf("%sЭлемент '%c' добавлен в стек!%s\n", GREEN, element, RESET);
-                    } else {
-                        printf("%sОшибка: стек переполнен!%s\n", RED, RESET);
-                    }
+                printf("Введите элемент для добавления:\n");
+                // TODO: добавить проверку на то что стек может быть переполнен
+                if (scanf(" %c", &element) == 1 && strchr(BRACES, element) != NULL) 
+                {
+                    push_st(&st_arr_stack, element);
+                    printf("%sЭлемент '%c' добавлен в стек!%s\n", GREEN, element, RESET);
                 }
                 break;
             }
             case 3: {
-                if (pop(&st_arr_stack, STATIC_ARRAY, &tracker)) {
+                if (pop_st(&st_arr_stack, &tracker)) {
                     printf("%sЭлемент удален из стека!%s\n", GREEN, RESET);
                 } else {
                     printf("%sОшибка: стек пуст!%s\n", RED, RESET);
@@ -61,13 +60,16 @@ void handle_static_stack()
                     printf("Err_allov");
                     break;
                 }
+                printf("Введите выражение : \n");
                 getchar();
                 if (fgets(expr, MAX_LEN_EXPR + 1, stdin) == NULL)
                     printf("Ошибка ввода!\n");
                 expr[strlen(expr) - 1] = '\0';
+                printf("expr : %s\n", expr);
                 static_array_stack_t st_stack;
                 init_static_array_stack(&st_stack);
-                if (check_brackets(&st_stack, STATIC_ARRAY, expr)) 
+                
+                if (check_brackets_st(&st_stack, STATIC_ARRAY, expr)) 
 
                     printf("%sСкобки расставлены правильно.%s\n", GREEN, RESET);
                 
@@ -128,18 +130,17 @@ void handle_dynamic_stack()
             }
             case 2: {
                 char element;
-                printf("Введите элемент для добавления: ");
-                if (scanf(" %c", &element) == 1) {
-                    if (push(&dn_arr_stack, DYNAMIC_ARRAY, element) == 0) {
-                        printf("%sЭлемент '%c' добавлен в стек!%s\n", GREEN, element, RESET);
-                    } else {
-                        printf("%sОшибка при добавлении элемента!%s\n", RED, RESET);
-                    }
+                printf("Введите элемент для добавления:\n");
+                // getchar();
+                if (scanf(" %c", &element) == 1 && strchr(BRACES, element) != NULL) {
+                    push_dn(&dn_arr_stack, element);
+                    printf("%sЭлемент '%c' добавлен в стек!%s\n", GREEN, element, RESET);
                 }
                 break;
+
             }
             case 3: {
-                if (pop(&dn_arr_stack, DYNAMIC_ARRAY, &tracker)) {
+                if (pop_dn(&dn_arr_stack, &tracker)) {
                     printf("%sЭлемент удален из стека!%s\n", GREEN, RESET);
                 } else {
                     printf("%sОшибка: стек пуст!%s\n", RED, RESET);
@@ -171,13 +172,14 @@ void handle_dynamic_stack()
                     break;
                 }
                 printf("Введите выражение\n");
+                getchar();
                 if (fgets(expr, MAX_LEN_EXPR + 1, stdin) == NULL)
                     printf("Ошибка ввода!\n");
                 expr[strlen(expr) - 1] = '\0';
                 dynamic_array_stack_t dn_stack;
                 init_dynamic_array_stack(&dn_stack, size);
 
-                if (check_brackets(&dn_stack, DYNAMIC_ARRAY, expr)) {
+                if (check_brackets_dn(&dn_stack, DYNAMIC_ARRAY, expr)) {
                     printf("%sСкобки расставлены правильно.%s\n", GREEN, RESET);
                 } else {
                     printf("%sОшибка в расстановке скобок.%s\n", RED, RESET);
@@ -231,11 +233,13 @@ void handle_list_stack()
             }
             case 2: {
                 char element;
-                printf("Введите элемент для добавления: ");
+                printf("Введите элемент для добавления:\n");
                 if (scanf(" %c", &element) == 1) 
                 {
-                    if (push_list(&list_stack, element) == EXIT_SUCCESS)
+                    if (strchr(BRACES, element) != NULL && push_list(&list_stack, element) == EXIT_SUCCESS)
                         printf("%sЭлемент '%c' добавлен в стек!%s\n", GREEN, element, RESET);
+                    else
+                        printf("Ошибка при добавлении элемента!\n");
                 }
                 break;
             }
@@ -272,8 +276,8 @@ void handle_list_stack()
                 if (fgets(expr, MAX_LEN_EXPR + 1, stdin) == NULL)
                     printf("Ошибка ввода!\n");
                 expr[strlen(expr) - 1] = '\0';
-
-                if (check_brackets_list(expr)) {
+                list_stack_t *li_stack = init_list_stack();
+                if (check_brackets_list(&li_stack, expr)) {
                     printf("%sСкобки расставлены правильно.%s\n", GREEN, RESET);
                 } else {
                     printf("%sОшибка в расстановке скобок.%s\n", RED, RESET);

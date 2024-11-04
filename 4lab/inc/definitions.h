@@ -12,6 +12,8 @@
 #define TURQ "\033[0;36m" 
 #define WHITE "\033[0;37m"
 
+
+#define BRACES "{([])}"
 #define MAX_LEN_STACK 1000
 #define MAX_LEN_EXPR 1000
 #define INITIAL_CAPACITY 100

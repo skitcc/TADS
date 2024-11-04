@@ -41,92 +41,57 @@ bool is_empty(void *stack, stack_type_t type)
     return true;
 }
 
-// Push элемент в стек
-int push(void *stack, stack_type_t type, char value) 
+
+void push_st(static_array_stack_t *stack, char value)
 {
-    if ((value != ')' && value != '(') &&
-        (value != ']' && value != '[') &&
-        (value != '}' && value != '{')) 
-    {
-        printf("%sЭлемент не добавлен в стек! (ожидалась скобка)%s\n", RED, RESET);
-        return EXIT_FAILURE;
-    }
-
-    if (type == STATIC_ARRAY) 
-    {
-        static_array_stack_t *s = (static_array_stack_t *)stack;
-        if (s->top < MAX_LEN_STACK - 1) 
-            s->data[++(s->top)] = value;
-        else 
-        {
-            printf("%sСтек (статический массив) полон.%s\n", RED, RESET);
-            return STACK_OVERFLOW;
-        }
-    } 
-    else if (type == DYNAMIC_ARRAY) 
-    {
-        dynamic_array_stack_t *s = (dynamic_array_stack_t *)stack;
-        s->data[++(s->top)] = value;
-    }
-
-    return EXIT_SUCCESS;
+    if (stack->top < MAX_LEN_STACK - 1) 
+        stack->data[++(stack->top)] = value;
 }
+
+void push_dn(dynamic_array_stack_t *stack, char value)
+{
+    stack->data[++(stack->top)] = value;
+}
+
 
 int push_list(list_stack_t **stack, char value)
 {
-    // printf("in push list\n");
     list_stack_t *newNode = (list_stack_t *)malloc(sizeof(list_stack_t));
-    if ((value != ')' && value != '(') &&
-        (value != ']' && value != '[') &&
-        (value != '}' && value != '{')) 
-    {
-        printf("%sЭлемент не добавлен в стек! (ожидалась скобка)%s\n", RED, RESET);
-        return EXIT_FAILURE;
-    }
     if (newNode == NULL) 
     {
         printf("%sОшибка выделения памяти для элемента списка.%s\n", RED, RESET);
         return ERR_ALLOCATION;
     }
-    // printf("added\n");
     newNode->data = value;
     newNode->next = (list_stack_t *)(*stack); 
     *stack = newNode;
     return EXIT_SUCCESS;
 }
 
-// Pop элемент из стека
-char pop(void *stack, stack_type_t type, removed_addresses_tracker_t *tracker) 
+
+char pop_st(static_array_stack_t *stack, removed_addresses_tracker_t *tracker)
 {
-    if (type == STATIC_ARRAY) 
+    if (tracker != NULL) 
+        tracker->removed_addresses[tracker->count++] = (char *)&stack->data[(stack->top)];
+    if (stack->top >= 0)
     {
-        static_array_stack_t *s = (static_array_stack_t *)stack;
-        if (tracker != NULL) 
-            tracker->removed_addresses[tracker->count++] = (char *)&s->data[(s->top)];
-        if (s->top >= 0)
-        {
-            return s->data[(s->top)--];
-        } 
-    }
-    else if (type == DYNAMIC_ARRAY) 
-    {
-        dynamic_array_stack_t *s = (dynamic_array_stack_t *)stack;
-        if (tracker != NULL) 
-            tracker->removed_addresses[tracker->count++] = (char *)&s->data[(s->top)];
-        if (s->top >= 0) 
-            return s->data[(s->top)--];
-    }
+        return stack->data[(stack->top)--];
+    } 
+    return '\0';
+}
+
+char pop_dn(dynamic_array_stack_t *stack, removed_addresses_tracker_t *tracker)
+{
+    if (tracker != NULL) 
+        tracker->removed_addresses[tracker->count++] = (char *)&stack->data[(stack->top)];
+    if (stack->top >= 0) 
+        return stack->data[(stack->top)--];
     return '\0';
 }
 
 
 char pop_list(list_stack_t **stack, removed_addresses_tracker_t *tracker)
 {
-    if (*stack == NULL)
-    {
-        printf("Ошибка: попытка извлечения из пустого стека.\n");
-        return '\0';
-    }
     list_stack_t *top = *stack;
     char value = top->data;
     if (tracker != NULL) 
@@ -168,12 +133,12 @@ void print_stack(void *stack, stack_type_t type)
 }
 
 // Проверка правильности расстановки скобок
-bool check_brackets(void *stack, stack_type_t type, const char *expr) {
+bool check_brackets_st(static_array_stack_t *stack, stack_type_t type, const char *expr) {
     for (int i = 0; i < (int)strlen(expr); i++) {
         char current = expr[i];
         // Если это открывающая скобка, добавляем её в стек
         if (current == '(' || current == '{' || current == '[') {
-            push(stack, type, current);
+            push_st(stack, current);
         }
         // Если это закрывающая скобка, проверяем соответствие
         else if (current == ')' || current == '}' || current == ']') {
@@ -181,7 +146,7 @@ bool check_brackets(void *stack, stack_type_t type, const char *expr) {
                 // Стек пуст, но встретилась закрывающая скобка — ошибка
                 return false;
             }
-            char top = pop(stack, type, NULL);
+            char top = pop_st(stack, NULL);
             if ((current == ')' && top != '(') ||
                 (current == ']' && top != '[') ||
                 (current == '}' && top != '{')) {
@@ -195,26 +160,53 @@ bool check_brackets(void *stack, stack_type_t type, const char *expr) {
     return is_empty(stack, type);
 }
 
-bool check_brackets_list(const char *expr) 
-{
-    list_stack_t *stack = NULL;
 
+bool check_brackets_dn(dynamic_array_stack_t *stack, stack_type_t type, const char *expr) {
+    for (int i = 0; i < (int)strlen(expr); i++) {
+        char current = expr[i];
+        // Если это открывающая скобка, добавляем её в стек
+        if (current == '(' || current == '{' || current == '[') {
+            push_dn(stack, current);
+        }
+        // Если это закрывающая скобка, проверяем соответствие
+        else if (current == ')' || current == '}' || current == ']') {
+            if (is_empty(stack, type)) {
+                // Стек пуст, но встретилась закрывающая скобка — ошибка
+                return false;
+            }
+            char top = pop_dn(stack, NULL);
+            if ((current == ')' && top != '(') ||
+                (current == ']' && top != '[') ||
+                (current == '}' && top != '{')) {
+                // Несоответствие пар скобок — ошибка
+                return false;
+            }
+        }
+    }
+
+    // Проверка на остатки в стеке (лишние открывающие скобки)
+    return is_empty(stack, type);
+}
+
+
+bool check_brackets_list(list_stack_t **stack, const char *expr) 
+{
     // Проходим по каждому символу в выражении
     for (int i = 0; expr[i] != '\0'; i++) {
         char current = expr[i];
 
         // Если это открывающая скобка, добавляем её в стек
         if (current == '(' || current == '{' || current == '[') {
-            if (push_list(&stack, current) != EXIT_SUCCESS) {
+            if (push_list(stack, current) != EXIT_SUCCESS) {
                 return false;
             }
         }
         // Если это закрывающая скобка, проверяем соответствие
         else if (current == ')' || current == '}' || current == ']') {
-            if (stack == NULL) {
+            if (*stack == NULL) {
                 return false;
             }
-            char top = pop_list(&stack, NULL);
+            char top = pop_list(stack, NULL);
             if ((current == ')' && top != '(') ||
                 (current == ']' && top != '[') ||
                 (current == '}' && top != '{')) {
@@ -223,7 +215,7 @@ bool check_brackets_list(const char *expr)
         }
     }
 
-    bool result = (stack == NULL);
-    free_list_stack(&stack);
+    bool result = (*stack == NULL);
+    free_list_stack(stack);
     return result;
 }
