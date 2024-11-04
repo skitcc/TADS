@@ -58,6 +58,7 @@ void compare_time(int size)
     dynamic_array_stack_t dn_stack;
     list_stack_t *li_stack = NULL;
 
+    initialize_stacks(&st_stack, &dn_stack, &li_stack);
 
 
     uint64_t avg_st = 0, avg_dn = 0, avg_li = 0;
@@ -68,7 +69,6 @@ void compare_time(int size)
     
     for (int i = 0; i < 100; i++)
     {
-        init_static_array_stack(&st_stack);
         fill_stack_from_expression(expr, &st_stack, STATIC_ARRAY);
         uint64_t start_tick = tick_count();
         check_brackets((void *)&st_stack, STATIC_ARRAY);
@@ -81,21 +81,25 @@ void compare_time(int size)
 
     printf("Время выполнения проверки правильности расстановки скобок для стека на статическом массиве (размер : %d):\n", size);
     printf(YELLOW "Такты: %" PRIu64 "\n" RESET, avg_st);
+    
 
     for (int i = 0; i < 100; i++)
     {
-        init_dynamic_array_stack(&dn_stack);
+        // Заполнение стека выражением
         fill_stack_from_expression(expr, &dn_stack, DYNAMIC_ARRAY);
+
+        // Измерение времени выполнения функции
         uint64_t start_tick = tick_count();
         check_brackets((void *)&dn_stack, DYNAMIC_ARRAY);
         uint64_t end_tick = tick_count();
         avg_dn += (end_tick - start_tick);
-        
         free_dynamic_array_stack(&dn_stack);
         init_dynamic_array_stack(&dn_stack);
-        
     }
+
     avg_dn /= 100;
+    // init_dynamic_array_stack(&dn_stack);
+    // fill_stack_from_expression(expr, &dn_stack, DYNAMIC_ARRAY);
     // uint64_t start_tick = tick_count();
     // check_brackets((void *)&dn_stack, DYNAMIC_ARRAY);
     // uint64_t end_tick = tick_count();
@@ -104,23 +108,35 @@ void compare_time(int size)
     printf("Время выполнения проверки правильности расстановки скобок для стека на динамическом массиве (размер : %d):\n", size);
     printf(YELLOW "Такты: %" PRIu64 "\n" RESET, avg_dn);
 
-    for (int i = 0; i < 100; i++) {
-        fill_list(expr, &li_stack);
-        // Сначала убедитесь, что `li_stack` не пуст и корректен перед каждым вызовом.
-        if (li_stack == NULL) {
-            printf("Ошибка: стек пустой перед вызовом функции.\n");
-            break;
-        }
+    // for (int i = 0; i < 100; i++) {
+    //     fill_list(expr, &li_stack);
+    //     if (li_stack == NULL) {
+    //         printf("Ошибка: стек пустой перед вызовом функции.\n");
+    //         break;
+    //     }
+    //     printf("here!\n");
+        
+    //     printf("here!\n");
+    //     uint64_t start_tick = tick_count();
+    //     check_brackets_list(li_stack);
+    //     uint64_t end_tick = tick_count();
+    //     avg_li += (end_tick - start_tick);
 
+    //     free_list_stack(&li_stack);
+    //     li_stack = init_list_stack();
+        
+    // }
+    // li_stack = init_list_stack();
+    printf("expr : %s\n", expr);
+    fill_list(expr, &li_stack);
+    print_stack((void *)li_stack, LIST);
+    uint64_t start_tick = tick_count();
+    check_brackets_list(li_stack);
+    uint64_t end_tick = tick_count();
+    avg_li += (end_tick - start_tick);
 
-        uint64_t start_tick = tick_count();
-        uint64_t end_tick = tick_count();
-        avg_li += (end_tick - start_tick);
-
-        free_list_stack(&li_stack);
-        li_stack = NULL;
-    }
-    avg_li /= 100;
+    // free_list_stack(&li_stack);
+    // avg_li /= 100;
 
     printf("Время выполнения проверки правильности расстановки скобок для стека на списке(размер : %d):\n", size);
     printf(YELLOW "Такты: %" PRIu64 "\n" RESET, avg_li);

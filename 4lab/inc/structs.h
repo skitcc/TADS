@@ -18,7 +18,7 @@ typedef struct
     int capacity;
 } dynamic_array_stack_t;
 
-typedef struct
+typedef struct list_stack_t
 {
     char data;
     struct list_stack_t *next;

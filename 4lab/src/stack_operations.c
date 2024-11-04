@@ -86,6 +86,7 @@ int push(void *stack, stack_type_t type, char value)
 
 int push_list(list_stack_t **stack, char value)
 {
+    printf("in push list\n");
     list_stack_t *newNode = (list_stack_t *)malloc(sizeof(list_stack_t));
     if ((value != ')' && value != '(') &&
         (value != ']' && value != '[') &&
@@ -99,6 +100,7 @@ int push_list(list_stack_t **stack, char value)
         printf("%sОшибка выделения памяти для элемента списка.%s\n", RED, RESET);
         return ERR_ALLOCATION;
     }
+    printf("added\n");
     newNode->data = value;
     newNode->next = (list_stack_t *)(*stack); 
     *stack = newNode;

@@ -14,7 +14,7 @@ int main()
     dynamic_array_stack_t dn_arr_stack;
     list_stack_t *list_stack = NULL;
 
-    initialize_stacks(&st_arr_stack, &dn_arr_stack, &list_stack);
+    
     
     char expr[MAX_LEN_EXPR + 1];
     int rc;
@@ -43,6 +43,8 @@ int main()
             printf("%sОшибка ввода опции!%s\n", RED, RESET);
             continue;
         }
+        if (section != 't')
+            initialize_stacks(&st_arr_stack, &dn_arr_stack, &list_stack);
         
         switch (section) {
             case 'a': {
@@ -70,8 +72,8 @@ int main()
                 break;
         }
     }
-    free_dynamic_array_stack(&dn_arr_stack);
-    free_list_stack(&list_stack);
+    // free_dynamic_array_stack(&dn_arr_stack);
+    // free_list_stack(&list_stack);
 
     return 0;
 }
