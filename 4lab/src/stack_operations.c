@@ -1,29 +1,6 @@
 #include "stack_operations.h"
 
 
-// Инициализация статического стека
-void init_static_array_stack(static_array_stack_t *s) 
-{
-    s->top = -1;
-}
-
-// Инициализация динамического стека
-void init_dynamic_array_stack(dynamic_array_stack_t *s) 
-{
-    s->top = -1;
-    s->capacity = 10;
-    s->data = (char *)malloc(s->capacity * sizeof(char));
-    if (s->data == NULL) {
-        printf("%sОшибка выделения памяти для динамического стека.%s\n", RED, RESET);
-
-    }
-}
-
-// Инициализация стека-списка
-list_stack_t *init_list_stack() 
-{
-    return NULL;
-}
 
 void free_dynamic_array_stack(dynamic_array_stack_t *stack) 
 {
@@ -75,6 +52,7 @@ int push(void *stack, stack_type_t type, char value)
         printf("%sЭлемент не добавлен в стек! (ожидалась скобка)%s\n", RED, RESET);
         return EXIT_FAILURE;
     }
+
     if (type == STATIC_ARRAY) 
     {
         static_array_stack_t *s = (static_array_stack_t *)stack;
@@ -85,7 +63,6 @@ int push(void *stack, stack_type_t type, char value)
             printf("%sСтек (статический массив) полон.%s\n", RED, RESET);
             return STACK_OVERFLOW;
         }
-        
     } 
     else if (type == DYNAMIC_ARRAY) 
     {
@@ -93,17 +70,19 @@ int push(void *stack, stack_type_t type, char value)
         if (s->top == s->capacity - 1) 
         {
             s->capacity *= 2;
-            s->data = (char *)realloc(s->data, s->capacity * sizeof(char));
-            if (s->data == NULL) 
+            char *new_data = (char *)realloc(s->data, s->capacity * sizeof(char));
+            if (new_data == NULL) 
             {
                 printf("%sОшибка выделения памяти при расширении динамического стека.%s\n", RED, RESET);
                 return ERR_ALLOCATION;
             }
+            s->data = new_data;
         }
         s->data[++(s->top)] = value;
     }
+
     return EXIT_SUCCESS;
-}   
+}
 
 int push_list(list_stack_t **stack, char value)
 {
@@ -121,7 +100,6 @@ int push_list(list_stack_t **stack, char value)
         return ERR_ALLOCATION;
     }
     newNode->data = value;
-    printf("new_data : %c\n", newNode->data);
     newNode->next = (list_stack_t *)(*stack); 
     *stack = newNode;
     return EXIT_SUCCESS;
@@ -135,15 +113,14 @@ char pop(void *stack, stack_type_t type, removed_addresses_tracker_t *tracker)
         static_array_stack_t *s = (static_array_stack_t *)stack;
         if (s->top >= 0)
         {
-            printf("%p\n", (char *)&s->data[(s->top)]);
-            tracker->removed_addresses[tracker->count++] = (char *)&s->data[(s->top)];
             return s->data[(s->top)--];
         } 
     }
     else if (type == DYNAMIC_ARRAY) 
     {
         dynamic_array_stack_t *s = (dynamic_array_stack_t *)stack;
-        tracker->removed_addresses[tracker->count++] = (char *)&s->data[(s->top)];
+        if (tracker != NULL) 
+            tracker->removed_addresses[tracker->count++] = (char *)&s->data[(s->top)];
         if (s->top >= 0) 
             return s->data[(s->top)--];
     }
@@ -158,9 +135,10 @@ char pop_list(list_stack_t **stack, removed_addresses_tracker_t *tracker)
         printf("Ошибка: попытка извлечения из пустого стека.\n");
         return '\0';
     }
-    list_stack_t *top = (list_stack_t *)(*stack);
+    list_stack_t *top = *stack;
     char value = top->data;
-    tracker->removed_addresses[tracker->count++] = (char *)&top->data;
+    if (tracker != NULL) 
+        tracker->removed_addresses[tracker->count++] = (char *)&top->data;
     *stack = top->next;
     free(top);
     return value;
@@ -203,10 +181,7 @@ bool check_brackets(void *stack, stack_type_t type)
     
     while (!is_empty(stack, type)) 
     {
-        printf("1\n");
         char current = pop(stack, type, NULL);
-        printf("1\n");
-        printf("current : %c\n", current);
         // Проверяем закрывающую скобку и соответствие с последующей открывающей
         if (current == ')' || current == ']' || current == '}') 
         {
@@ -238,15 +213,12 @@ bool check_brackets_list(list_stack_t *stack)
     while (stack != NULL) 
     {
         char current = pop_list(&stack, NULL);
-        printf("current : %c\n", current);
-
         if (current == ')' || current == ']' || current == '}') 
         {
             if (stack == NULL)
                 return false;
 
             char top = pop_list(&stack, NULL);
-            printf("current : %c, top : %c\n", current, top);
 
             // Проверяем соответствие пар скобок
             if ((current == ')' && top != '(') ||

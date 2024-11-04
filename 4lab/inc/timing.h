@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <inttypes.h>
 
+
 void compare_time(int size);
 
 

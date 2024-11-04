@@ -3,8 +3,10 @@
 
 #include "definitions.h"
 #include "structs.h"
+#include "stack_operations.h"
 
 #include <stdio.h>
+#include <stdlib.h>
 
 
 
