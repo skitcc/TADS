@@ -8,10 +8,11 @@ void init_static_array_stack(static_array_stack_t *s)
 }
 
 // Инициализация динамического стека
-void init_dynamic_array_stack(dynamic_array_stack_t *s, int size) 
+void init_dynamic_array_stack(dynamic_array_stack_t *s) 
 {
     s->top = -1;
-    s->data = (char *)malloc((size_t)size * sizeof(char));
+    s->capacity = INITIAL_CAPACITY;
+    s->data = (char *)malloc((size_t)s->capacity * sizeof(char));
     if (s->data == NULL) {
         printf("%sОшибка выделения памяти для динамического стека.%s\n", RED, RESET);
     }

@@ -48,8 +48,22 @@ void push_st(static_array_stack_t *stack, char value)
         stack->data[++(stack->top)] = value;
 }
 
-void push_dn(dynamic_array_stack_t *stack, char value)
+void push_dn(dynamic_array_stack_t *stack, char value) 
 {
+    // printf("top : %d\n", stack->top);
+    if (stack->top >= stack->capacity - 1) {
+        // Увеличиваем емкость в два раза
+        // printf("current_capacity : %d\n", stack->capacity);
+        stack->capacity *= 2;
+        char *new_data = (char *)realloc(stack->data, (size_t)stack->capacity * sizeof(char));
+        if (new_data == NULL) {
+            printf("%sОшибка выделения дополнительной памяти для динамического стека.%s\n", RED, RESET);
+            return; // Ошибка, не добавляем элемент
+        }
+        stack->data = new_data;
+    }
+
+    // Добавляем элемент в стек
     stack->data[++(stack->top)] = value;
 }
 
@@ -134,7 +148,7 @@ void print_stack(void *stack, stack_type_t type)
 
 // Проверка правильности расстановки скобок
 bool check_brackets_st(static_array_stack_t *stack, stack_type_t type, const char *expr) {
-    for (int i = 0; i < (int)strlen(expr); i++) {
+    for (int i = 0; expr[i] != '\0'; i++) {
         char current = expr[i];
         // Если это открывающая скобка, добавляем её в стек
         if (current == '(' || current == '{' || current == '[') {
@@ -162,7 +176,7 @@ bool check_brackets_st(static_array_stack_t *stack, stack_type_t type, const cha
 
 
 bool check_brackets_dn(dynamic_array_stack_t *stack, stack_type_t type, const char *expr) {
-    for (int i = 0; i < (int)strlen(expr); i++) {
+    for (int i = 0; expr[i] != '\0'; i++) {
         char current = expr[i];
         // Если это открывающая скобка, добавляем её в стек
         if (current == '(' || current == '{' || current == '[') {

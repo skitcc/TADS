@@ -9,10 +9,7 @@
 #include <stdlib.h>
 
 
-
-void fill_stack_from_expression(const char *expr, void *stack, stack_type_t type);
-void fill_list(const char *expr, list_stack_t **stack);
-void init_dynamic_array_stack(dynamic_array_stack_t *s, int size);
+void init_dynamic_array_stack(dynamic_array_stack_t *s);
 void init_static_array_stack(static_array_stack_t *s);
 size_t calculate_list_memory(const list_stack_t *stack);
 

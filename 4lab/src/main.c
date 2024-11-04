@@ -20,6 +20,7 @@ int main()
         printf("%sb - использование стека посредством динамического массива%s\n", TURQ, RESET);
         printf("%sc - использование стека посредством списка%s\n", TURQ, RESET);
         printf("%st - Просмотр времени выполнения и затраченной памяти%s\n", TURQ, RESET);
+        printf("%sq - Выход%s\n", TURQ, RESET);
         
         if (scanf("%c", &section) != 1) {
             printf("%sОшибка ввода опции!%s\n", RED, RESET);
@@ -46,6 +47,9 @@ int main()
                     printf("Введен неверный размер!\n");
                 compare_time(size);
                 break;
+            }
+            case 'q' : {
+                return EXIT_SUCCESS;
             }
             default:
                 printf("%sОшибка: неверная опция!%s\n", RED, RESET);
