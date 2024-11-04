@@ -26,26 +26,14 @@ char* generate_balanced_parentheses(int size) {
         return NULL; 
     }
 
-    int open_count = size / 2;  
-    int close_count = size / 2; 
-    int index = 0;             
-
     // Генерируем строку
     for (int i = 0; i < size; i++) {
-        if (open_count > 0) { 
-            result[index++] = '(';
-            open_count--;
-        } else {
-            result[index++] = ')'; 
-            close_count--;
+        if (i % 2 == 0)
+        {
+            result[i] = '(';
         }
-
-        if (open_count == 0 && close_count > 0) {
-            while (close_count > 0) {
-                result[index++] = ')';
-                close_count--;
-            }
-        }
+        else
+            result[i] = ')';
     }
     
     result[size] = '\0'; // Нуль-терминатор для строки
@@ -108,35 +96,29 @@ void compare_time(int size)
     printf("Время выполнения проверки правильности расстановки скобок для стека на динамическом массиве (размер : %d):\n", size);
     printf(YELLOW "Такты: %" PRIu64 "\n" RESET, avg_dn);
 
-    // for (int i = 0; i < 100; i++) {
-    //     fill_list(expr, &li_stack);
-    //     if (li_stack == NULL) {
-    //         printf("Ошибка: стек пустой перед вызовом функции.\n");
-    //         break;
-    //     }
-    //     printf("here!\n");
-        
-    //     printf("here!\n");
-    //     uint64_t start_tick = tick_count();
-    //     check_brackets_list(li_stack);
-    //     uint64_t end_tick = tick_count();
-    //     avg_li += (end_tick - start_tick);
+    for (int i = 0; i < 100; i++) {
+        fill_list(expr, &li_stack);
+        if (li_stack == NULL) {
+            printf("Ошибка: стек пустой перед вызовом функции.\n");
+            break;
+        };
+        uint64_t start_tick = tick_count();
+        check_brackets_list(li_stack);
+        uint64_t end_tick = tick_count();
+        avg_li += (end_tick - start_tick);
 
-    //     free_list_stack(&li_stack);
-    //     li_stack = init_list_stack();
+        li_stack = init_list_stack();
         
-    // }
+    }
     // li_stack = init_list_stack();
-    printf("expr : %s\n", expr);
-    fill_list(expr, &li_stack);
-    print_stack((void *)li_stack, LIST);
-    uint64_t start_tick = tick_count();
-    check_brackets_list(li_stack);
-    uint64_t end_tick = tick_count();
-    avg_li += (end_tick - start_tick);
+    // fill_list(expr, &li_stack);
+    // uint64_t start_tick = tick_count();
+    // check_brackets_list(li_stack);
+    // uint64_t end_tick = tick_count();
+    // avg_li += (end_tick - start_tick);
 
     // free_list_stack(&li_stack);
-    // avg_li /= 100;
+    avg_li /= 100;
 
     printf("Время выполнения проверки правильности расстановки скобок для стека на списке(размер : %d):\n", size);
     printf(YELLOW "Такты: %" PRIu64 "\n" RESET, avg_li);
