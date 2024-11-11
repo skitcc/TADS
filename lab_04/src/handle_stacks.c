@@ -12,21 +12,23 @@ void handle_static_stack()
     {
         print_static_menu();
         if (scanf("%d", &mode) != 1 || mode < 0 || mode > 7) {
-            printf("%sОшибка ввода!%s\n", RED, RESET);
+            printf("Ошибка ввода опции!\n");
+            while (getchar() != '\n');
+            break;
         }
 
         switch (mode) {
             case 1: {
                 init_static_array_stack(&st_arr_stack);
                 is_created = true;
-                printf("Стек на статическом массиве успешно реализован!\n");
+                printf("%sСтек на статическом массиве успешно реализован!%s\n", GREEN, RESET);
                 break;
             }
             case 2: {
                 char element;
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
                 printf("Введите элемент для добавления:\n");
@@ -38,19 +40,19 @@ void handle_static_stack()
                 }
                 else
                 {
-                    printf("Ожидалась скобка!\n");
+                    printf("%sОжидалась скобка!%s\n", RED, RESET);
                 }
                 break;
             }
             case 3: {
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
-                if (is_empty((void *)&st_arr_stack, STATIC_ARRAY))
+                if (is_empty(&st_arr_stack, STATIC_ARRAY))
                 {
-                    printf("Стек пуст!");
+                    printf("%sСтек пуст!%s", YELLOW, RESET);
                     break;   
                 }
                 if (pop_st(&st_arr_stack, &tracker)) {
@@ -63,7 +65,7 @@ void handle_static_stack()
             case 4: {
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
                 if (is_empty(&st_arr_stack, STATIC_ARRAY))
@@ -75,7 +77,7 @@ void handle_static_stack()
                 break;
             }
             case 5: {
-                printf("Стек реализован через статический массив, размер 1000\n");
+                printf("%sСтек реализован через статический массив, размер 1000%s\n", YELLOW, RESET);
                 char *expr = NULL;
                 size_t size = 1000;
                 expr = malloc(size + 1);
@@ -110,7 +112,7 @@ void handle_static_stack()
             case 7: {
                 if (tracker.count == 0)
                     printf("%sСписок удаленных адресов пуст!%s", GREEN, RESET);
-                printf("Список удаленных адресов\n");
+                printf("%sСписок удаленных адресов%s\n", YELLOW, RESET);
                 for (int i = 0; i < tracker.count; i++)
                 {
                     printf("Удаленный адрес %d - %p\n", i + 1, (char *)tracker.removed_addresses[i]);
@@ -138,21 +140,23 @@ void handle_dynamic_stack()
     while (mode) {
         print_dynamic_menu();
         if (scanf("%d", &mode) != 1 || mode < 0 || mode > 7) {
-            printf("%sОшибка ввода опции!%s\n", RED, RESET);
+            printf("Ошибка ввода опции!\n");
+            while (getchar() != '\n');
+            break;
         }
 
         switch (mode) {
             case 1: {
                 is_created = true;
                 init_dynamic_array_stack(&dn_arr_stack);
-                printf("Стек размера 10 успешно создан!\n");
+                printf("%sСтек размера 10 успешно создан!%s\n", GREEN, RESET);
                 break;
             }
             case 2: {
                 char element;
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
                 printf("Введите элемент для добавления:\n");
@@ -163,7 +167,7 @@ void handle_dynamic_stack()
                 }
                 else
                 {
-                    printf("Ожидалась скобка, элемент не добавлен на стек!\n");
+                    printf("%sОжидалась скобка, элемент не добавлен на стек!%s\n", RED, RESET);
                 }
                 break;
 
@@ -172,12 +176,12 @@ void handle_dynamic_stack()
 
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
                 if (is_empty((void *)&dn_arr_stack, DYNAMIC_ARRAY))
                 {
-                    printf("Стек пуст!");
+                    printf("%sСтек пуст!%s", RED, RESET);
                     break;   
                 }
                 if (pop_dn(&dn_arr_stack, &tracker)) {
@@ -190,7 +194,7 @@ void handle_dynamic_stack()
             case 4: {
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
                 if (is_empty(&dn_arr_stack, DYNAMIC_ARRAY))
@@ -262,14 +266,16 @@ void handle_list_stack()
     while (mode) {
         print_list_menu();
         if (scanf("%d", &mode) != 1 || mode < 0 || mode > 7) {
-            printf("%sОшибка ввода опции!%s\n", RED, RESET);
+            printf("Ошибка ввода опции!\n");
+            while (getchar() != '\n');
+            break;
         }
 
         switch (mode) {
             case 1: {
                 is_created = true;
                 list_stack = init_list_stack();
-                printf("Стек через односвязный список создан!\n");
+                printf("%sСтек через односвязный список создан!%s\n", GREEN, RESET);
                 break;
             }
             case 2: {
@@ -280,11 +286,11 @@ void handle_list_stack()
                     if (strchr(BRACES, element) != NULL && push_list(&list_stack, element) == EXIT_SUCCESS)
                         printf("%sЭлемент '%c' добавлен в стек!%s\n", GREEN, element, RESET);
                     else
-                        printf("Ошибка при добавлении элемента!\n");
+                        printf("%sОшибка при добавлении элемента!%s\n", RED, RESET);
                 }
                 else
                 {
-                    printf("Ожидалась скобка, элемент не добавлен на стек!\n");
+                    printf("%sОжидалась скобка, элемент не добавлен на стек!%s\n", RED, RESET);
                 }
                 break;
             }
@@ -292,12 +298,12 @@ void handle_list_stack()
 
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
                 if (is_empty((void *)list_stack, LIST))
                 {
-                    printf("Стек пуст!");
+                    printf("%sСтек пуст!%s", RED, RESET);
                     break;   
                 }
                 if (pop_list(&list_stack, &tracker)) 
@@ -311,7 +317,7 @@ void handle_list_stack()
             case 4: {
                 if (!is_created)
                 {
-                    printf("Стек еще не создан!");
+                    printf("%sСтек еще не создан!%s\n", RED, RESET);
                     break;
                 }
                 if (is_empty(list_stack, LIST))

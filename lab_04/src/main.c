@@ -45,6 +45,11 @@ int main()
                 int size = 0;
                 if (!scanf("%d", &size))
                     printf("Введен неверный размер!\n");
+                if (size % 2)
+                {
+                    printf("Размер должен быть четным!\n");
+                    break;
+                }
                 compare_time(size);
                 break;
             }
@@ -59,5 +64,5 @@ int main()
     // free_dynamic_array_stack(&dn_arr_stack);
     // free_list_stack(&list_stack);
 
-    return 0;
+    return EXIT_SUCCESS;
 }
