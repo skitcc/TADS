@@ -14,11 +14,14 @@ double get_time(int t1, int t2)
     return r;
 }
 
-int chance(void)
+int chance(float p)
 {
-    int mas[10] = {0, 1, 0, 0, 0, 0, 1, 0, 0, 0};
-    int ind = rand() % 10;
-    return mas[ind];
+
+    double ind = (double)rand() / RAND_MAX;
+    if (ind > p)
+        return 1;
+    return 0;
+
 }
 
 void add_mem(struct queue_slot *slot, struct mem_slot **mem)

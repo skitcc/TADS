@@ -10,7 +10,7 @@
 
 unsigned long long tick(void);
 double get_time(int t1, int t2);
-int chance(void);
+int chance(float p);
 void add_mem(struct queue_slot *slot, struct mem_slot **mem);
 void delete_mem(struct queue_slot *slot, struct mem_slot *mem);
 

@@ -13,15 +13,41 @@ unsigned long simulate_service_list(struct mem_slot **mem, int *memory_used)
 
     printf("\nМоделирование с использованием списка:\n\n");
 
+
+    int start = 0, end = 0;    
+    printf("Введите начальное и конечное значение для времени прихода от 1 до 10000!\n");
+
+    if (scanf("%d%d", &start, &end) != 2 || end > 10000 || end < 1 || start > end || start > 10000 || start < 1)    {
+        printf("Ошибка ввода!\n");
+        return -1;
+    }
+
+    printf("Введите диапазон время обработки в ОА(два числа) от 1 до 10000!\n");
+
+    int preproc_start = 0, preproc_end = 0;
+
+    if (scanf("%d%d", &preproc_start, &preproc_end) != 2 || preproc_start > preproc_end || preproc_end > 10000 || preproc_end < 1 || preproc_start > 10000 || preproc_end < 1)
+    {
+        printf("Ошибка ввода!\n");
+        return -1;
+    }
+
+    float p = 0;
+    printf("Введите значение вероятности от 0 до 1\n");
+    if (scanf("%f", &p) != 1 || p > 1 || p < 0)
+    {
+        printf("Ошибка ввода!\n");
+        return -1;
+    }
     unsigned long start_time = tick(), time_adjustment = 0, temp_time = 0;
 
     while (machine.processed_count < TOTAL_NEED) {
         // Обрабатываем новые заявки в очереди
         while (queue.len == 0 || machine.time > total_time) {
-            process_new_request_list(&total_time, &queue, &machine, mem);
+            process_new_request_list(&total_time, &queue, &machine, mem, start, end);
         }
 
-        process_status = process_request_list(&machine, &queue, mem);
+        process_status = process_request_list(&machine, &queue, mem, preproc_start, preproc_end, p);
         
         // Вывод промежуточной информации
         temp_time = tick();
@@ -37,18 +63,18 @@ unsigned long simulate_service_list(struct mem_slot **mem, int *memory_used)
 
     unsigned long elapsed_time = tick() - start_time - time_adjustment;
 
-    double expected_time = calculate_expected_model_time();
+    double expected_time = calculate_expected_model_time(start, end, preproc_start, preproc_end);
     *memory_used = queue.max * sizeof(struct queue_slot);
 
-    display_final_results(&machine, &queue, memory_used, queue.max);
+    display_final_results(&machine, &queue, memory_used, queue.max, start, end, preproc_start, preproc_end);
 
     return elapsed_time;
 }
 
 // Обработка новой заявки
-void process_new_request_list(double *total_time, struct queue *queue, struct machine *machine, struct mem_slot **mem) 
+void process_new_request_list(double *total_time, struct queue *queue, struct machine *machine, struct mem_slot **mem, int start, int end) 
 {
-    double arrival_interval = get_time(COMING_START, COMING_END);
+    double arrival_interval = get_time(start, end);
     *total_time += arrival_interval;
 
     // Если очередь пуста, обновляем время простоя машины
@@ -75,7 +101,7 @@ void process_new_request_list(double *total_time, struct queue *queue, struct ma
 }
 
 // Обработка заявки на аппарате
-int process_request_list(struct machine *machine, struct queue *queue, struct mem_slot **mem) 
+int process_request_list(struct machine *machine, struct queue *queue, struct mem_slot **mem, int preproc_start, int preproc_end, float p) 
 {
     int processed = 0;
 
@@ -85,14 +111,14 @@ int process_request_list(struct machine *machine, struct queue *queue, struct me
     }
 
     machine->triggering++;
-    machine->time += get_time(PROCESSING_START, PROCESSING_END);
+    machine->time += get_time(preproc_start, preproc_end);
 
     struct queue_slot *current_request = queue->pout;
     if (queue->len > 1) {
         queue->pout = current_request->next;
     }
 
-    if (!chance()) {  // Вероятность возвращения в очередь
+    if (!chance(p)) {  // Вероятность возвращения в очередь
         queue->pin->next = current_request;
         queue->pin = current_request;
         current_request->next = NULL;

@@ -2,7 +2,7 @@
 
 
 // Функция вычисления ожидаемого времени моделирования
-double calculate_expected_model_time() 
+double calculate_expected_model_time(int arrival_start, int arrival_end, int preproc_start, int preproc_end) 
 {
     double model_time = 0;
 
@@ -27,14 +27,14 @@ void display_interim_results(struct machine *machine, struct queue *queue)
 }
 
 // Функция вывода окончательных результатов
-void display_final_results(struct machine *machine, struct queue *queue, int *memory_used, int max_queue_size) 
+void display_final_results(struct machine *machine, struct queue *queue, int *memory_used, int max_queue_size, int arrival_start, int arrival_end, int preproc_start, int preproc_end) 
 {
-    double expected_model_time = calculate_expected_model_time();
+    double expected_model_time = calculate_expected_model_time(arrival_start, arrival_end, preproc_start, preproc_end);
     *memory_used = max_queue_size * (sizeof(struct queue_slot) - sizeof(struct queue_slot*));
 
     printf("Ожидаемое время моделирования: %.2f\n", expected_model_time);
     printf("Полученное время моделирования: %.2f\n", machine->time);
-    printf("Погрешность: ~%.2f%%\n\n", fabs((machine->time - expected_model_time) / expected_model_time * 100));
+    // printf("Погрешность: ~%.2f%%\n\n", fabs((machine->time - expected_model_time) / expected_model_time * 100));
     printf("Количество заявок, поступивших в очередь: %d\n", queue->in_num);
     printf("Количество заявок, покинувших очередь: %d\n", machine->processed_count);
     printf("Среднее время в очереди: %.2f\n", queue->total_stay_time / machine->processed_count);
