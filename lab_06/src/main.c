@@ -68,10 +68,10 @@ int main(int argc, char *argv[])
     print_tree(root, 0, "root");
     debug_tree_structure(root);
 
-    if (compare_time(file_in))
-    {
-        return 5;
-    }
+    // if (compare_time(file_in))
+    // {
+    //     return 5;
+    // }
     
 
     free_tree(root);
