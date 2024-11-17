@@ -73,7 +73,7 @@ void gen_data_file(const char *filename)
 
     if (!file)
         return;
-    for (int i = 0; i < 500; i++)
+    for (int i = 0; i < 1000; i++)
     {
         int x = 1 + rand() % (500 - 1 + 1);
 

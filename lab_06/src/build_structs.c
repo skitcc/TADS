@@ -14,8 +14,14 @@ node_t *build_tree_from_file(const char *filename)
     size_t n = 0;
     while (getline(&word, &n, file) != -1)
     {
-        word[strcspn(word, "\n")] = '\0';
+        word[strcspn(word, "\r\n")] = '\0'; // Удалить символы новой строки
+        if (strlen(word) == 0)             // Пропуск пустых строк
+            continue;
+
         root = insert(root, word);
+
+        word = NULL; // Установить указатель в NULL
+        n = 0;       // Сбросить размер буфера
     }
 
     fclose(file);
@@ -46,43 +52,30 @@ int get_quantity_words(const char *filename)
 }
 
 
-char **build_mas_from_file(const char *filename, int *len)
-{
+char **build_mas_from_file(const char *filename, int *len) {
     FILE *file = fopen(filename, "r");
     if (!file)
         return NULL;
 
     int word_count = get_quantity_words(filename);
-    // printf("n = %d\n", word_count);
-    if (word_count == -1)
+    if (word_count == -1) {
+        fclose(file);
         return NULL;
+    }
 
     *len = word_count;
 
     char **mas = malloc(sizeof(char *) * word_count);
-    if (!mas)
-    {
+    if (!mas) {
         fclose(file);
         return NULL;
     }
+
     char *word = NULL;
     size_t n = 0;
-    // printf("1\n");
-    for (int i = 0; i < word_count; i++)
-    {
-        if (getline(&word, &n, file) == -1)
-        {
-            free(mas);
-            fclose(file);
-            return NULL;
-        }
-        word[strcspn(word, "\n")] = '\0';
-        // printf("word : %s\n", word);
-        mas[i] = malloc(sizeof(char) * (strlen(word) + 1));
-        if (!mas[i])
-        {
-            for (int k = 0; k < i; k++)
-            {
+    for (int i = 0; i < word_count; i++) {
+        if (getline(&word, &n, file) == -1) {
+            for (int k = 0; k < i; k++) {
                 free(mas[k]);
             }
             free(mas);
@@ -90,12 +83,27 @@ char **build_mas_from_file(const char *filename, int *len)
             free(word);
             return NULL;
         }
+
+        word[strcspn(word, "\n")] = '\0';
+
+        mas[i] = malloc(strlen(word) + 1);
+        if (!mas[i]) {
+            for (int k = 0; k < i; k++)
+             
+                free(mas[k]);
+            
+            free(mas);
+            fclose(file);
+            free(word);
+            return NULL;
+        }
+
         strcpy(mas[i], word);
-        
     }
+
     fclose(file);
     free(word);
 
     return mas;
-    
 }
+

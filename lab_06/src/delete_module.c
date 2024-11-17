@@ -7,39 +7,40 @@ void free_node(node_t *node)
     {
         free(node->value);
         free(node);
+        node = NULL;
     }
 }
 
 
-node_t *find_min(node_t *root) 
+static node_t *find_min(node_t *root) 
 {
     while (root && root->left)
         root = root->left;
     return root;
 }
 
-node_t *delete_node_by_value(node_t *root, const char *value)
-{
-    if (root == NULL)
-        return NULL;
+// node_t *delete_node_by_value(node_t *root, const char *value)
+// {
+//     if (root == NULL)
+//         return NULL;
 
-    int diff = strcmp(value, root->value);
+//     int diff = strcmp(value, root->value);
 
-    if (diff < 0)
-    {
-        root->left = delete_node_by_value(root->left, value);
-    }
-    else if (diff > 0)
-    {
-        root->right = delete_node_by_value(root->right, value);
-    }
-    else
-    {
-        return delete_node(root);
-    }
+//     if (diff < 0)
+//     {
+//         root->left = delete_node_by_value(root->left, value);
+//     }
+//     else if (diff > 0)
+//     {
+//         root->right = delete_node_by_value(root->right, value);
+//     }
+//     else
+//     {
+//         return delete_node(root);
+//     }
 
-    return root;
-}
+//     return root;
+// }
 
 
 node_t *delete_node(node_t *node)
@@ -60,10 +61,17 @@ node_t *delete_node(node_t *node)
         return temp;
     }
 
+    else if (node->left == NULL && node->right == NULL)
+    {
+        free_node(node);
+        return NULL;
+    }
+
     else
     {
         node_t *min_node = find_min(node->right);
-        node->value = min_node->value;
+        free(node->value); // Освобождаем старое значение
+        node->value = strdup(min_node->value); // Копируем значение
         node->right = delete_node(min_node);
         return node;
     }

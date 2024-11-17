@@ -1,6 +1,6 @@
 # Компилятор и флаги
 CC = gcc
-CFLAGS = -std=c99 -Wall -Wextra -Wpedantic -Wvla -O2 -lm -g -lc
+CFLAGS = -std=c99 -Wall -Werror -Wextra -Wpedantic -Wvla -O2 -lm -g3 а 
 OUTPUT = app.exe
 
 # Папки с исходниками, заголовочными файлами и объектными файлами

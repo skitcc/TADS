@@ -17,7 +17,8 @@ int main(int argc, char *argv[])
         return 2;
 
     char file_in[LEN_FILENAME];
-    strncpy(file_in, argv[1], strlen(argv[1]));
+    strncpy(file_in, argv[1], LEN_FILENAME - 1);
+    file_in[LEN_FILENAME - 1] = '\0';
 
 
     gen_data_file(file_in);
@@ -37,7 +38,7 @@ int main(int argc, char *argv[])
         return 2;
 
     printf("mas\n");
-    print_mas(mas_of_words, word_count);
+    // print_mas(mas_of_words, word_count);
 
 
     print_tree(root, 0, "root");
@@ -59,18 +60,18 @@ int main(int argc, char *argv[])
     if (new_word_count == 0)
         printf("Массив пуст!\n");
     
-    print_mas(mas_of_words, new_word_count);
+    // print_mas(mas_of_words, new_word_count); 
 
     root = delete_nodes_starting_with(root, target);
 
 
-    // print_tree(root, 0, "root");
-    // debug_tree_structure(root);
+    print_tree(root, 0, "root");
+    debug_tree_structure(root);
 
-    // if (compare_time(file_in))
-    // {
-    //     return 5;
-    // }
+    if (compare_time(file_in))
+    {
+        return 5;
+    }
     
 
     free_tree(root);

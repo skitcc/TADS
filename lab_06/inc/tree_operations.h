@@ -10,8 +10,8 @@
 
 #include "structs.h"
 
-node_t *create_node(const char *value);
-node_t *insert(node_t *root, const char *value);
+node_t *create_node(char *value);
+node_t *insert(node_t *root, char *value);
 
 
 #endif

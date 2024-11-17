@@ -23,7 +23,6 @@
 node_t *delete_nodes_starting_with(node_t *root, char start_char);
 node_t *delete_node_by_value(node_t *root, const char *value);
 node_t *delete_node(node_t *node);
-int delete_elems_starts_with_sorted(char **mas, int len, char start_char);
 int delete_elems_starts_with(char **mas, int len, char start_char);
 
 #endif
