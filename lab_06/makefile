@@ -28,7 +28,7 @@ $(OUT_DIR):
 
 # Правило очистки (удаление .o файлов и исполняемого файла)
 clean:
-	rm -rf $(OUT_DIR) $(OUTPUT) ./data/*
+	rm -r $(OUT_DIR) $(OUTPUT) ./data/*
 
 # Правило "all" для сборки по умолчанию
 all: $(OUTPUT)

@@ -85,19 +85,31 @@ void free_mas(char **mas, int len)
 
 void gen_data_file(const char *filename, int len)
 {
+    if (len > MAX_LEN_FILE)
+    {
+        PRINT_COLOR(RED, "Максимальное кол-во элементов превышено! (10000)\n");
+    }
     srand(time(NULL));
 
     FILE *file = fopen(filename, "w");
 
     if (!file)
         return;
+
+    short *used = calloc(len, sizeof(short));
+    if (!used)
+        return;
+    
     for (int i = 0; i < len; i++)
     {
-        int x = 1 + rand() % (500 - 1 + 1);
-
-        fprintf(file, "%d\n", x);
+        int x = 1 + rand() % len;
+        if (!used[x])
+        {
+            used[x] = 1;
+            fprintf(file, "%d\n", x);
+        }
     }
-
+    free(used);
     fclose(file);
 }
 

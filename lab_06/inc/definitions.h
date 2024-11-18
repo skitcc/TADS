@@ -15,6 +15,7 @@
 
 #define LEN_FILENAME 50
 #define MAX_MEASURMENTS 1000
+#define MAX_LEN_FILE 10000
 
 
 #define PRINT_COLOR(color, message) printf(color message RESET "\n")
