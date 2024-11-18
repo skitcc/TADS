@@ -10,6 +10,8 @@
 #include "delete_module.h"
 #include "build_structs.h"
 #include "utils.h"
+#include "definitions.h"
+#include "mas_operations.h"
 
 
 int compare_time(const char *filename);

@@ -7,6 +7,7 @@
 
 
 #include "tree_operations.h"
+#include "definitions.h"
 
 
 void export_to_dot(node_t *root, const char *filename);

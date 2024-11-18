@@ -15,14 +15,12 @@
 #include <ctype.h>
 
 
-
-
 #include "structs.h"
+#include "utils.h"
+#include "tree_operations.h"
 
 
 node_t *delete_nodes_starting_with(node_t *root, char start_char);
-node_t *delete_node_by_value(node_t *root, const char *value);
-node_t *delete_node(node_t *node);
-int delete_elems_starts_with(char **mas, int len, char start_char);
+int delete_elems_starts_with(const char *filename, char start_char);
 
 #endif

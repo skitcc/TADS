@@ -15,54 +15,94 @@ uint64_t tick_count(void)
     return ticks;
 }
 
-
-int compare_time(const char *filename)
+int compare_time(const char *filename) 
 {
     node_t *root = NULL;
 
-    printf("Введите символ для удаления\n");
-    char target;
+    PRINT_COLOR(VIOLET, "Введите символ для удаления");
+    char target = 0;
     char buffer[100];
-    // while(getchar() != '\n');
-    if (fgets(buffer, sizeof(buffer), stdin) == NULL || sscanf(buffer, "%c", &target) != 1)
-    {
+    if (fgets(buffer, sizeof(buffer), stdin) == NULL || sscanf(buffer, "%c", &target) != 1) {
+        PRINT_COLOR(RED, "Ошибка чтения символа для удаления!\n");
         return 1;
     }
-    printf("1\n");
 
     uint64_t avg_tree = 0;
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < MAX_MEASURMENTS; i++) 
     {
         root = build_tree_from_file(filename);
-        if (root == NULL)
+        if (root == NULL) 
+        {
+            PRINT_COLOR(RED, "Ошибка построения дерева!\n");
             return 1;
+        }
+
         uint64_t start_tick = tick_count();
         root = delete_nodes_starting_with(root, target);
         uint64_t end_tick = tick_count();
         avg_tree += (end_tick - start_tick);
+
         free_tree(root);
     }
-    avg_tree /= 1000;
+    avg_tree /= MAX_MEASURMENTS;
 
-    uint64_t avg_mas = 0;
-    char **mas = NULL;
-
-    for (int i = 0; i < 1000; i++)
+    uint64_t avg_file = 0;
+    for (int i = 0; i < MAX_MEASURMENTS; i++) 
     {
-        int len = 0;
-        mas = build_mas_from_file(filename, &len);
         uint64_t start_tick = tick_count();
-        int new_size = delete_elems_starts_with(mas, len, target);
+        int new_size = delete_elems_starts_with(filename, target);
         uint64_t end_tick = tick_count();
-        avg_mas += (end_tick - start_tick);
-        free_mas(mas, new_size);
+        if (new_size == -1)
+            return 1;
+        avg_file += (end_tick - start_tick);
     }
-    avg_mas /= 1000;
+    avg_file /= MAX_MEASURMENTS;
 
+    printf("Удаление для дерева: %" PRIu64 " тактов\n", avg_tree);
+    printf("Удаление для файла: %" PRIu64 " тактов\n", avg_file);
 
-    printf("Удаление для дерева Такты: %" PRIu64 "\n", avg_tree);
-    printf("Удаление для массива Такты: %" PRIu64 "\n", avg_mas);
+    PRINT_COLOR(VIOLET, "Введите элемент для поиска");
+    char value[100];
+    if (fgets(value, sizeof(value), stdin) == NULL) 
+    {
+        PRINT_COLOR(RED, "Ошибка чтения элемента для поиска!\n");
+        return 1;
+    }
+    value[strcspn(value, "\n")] = '\0';
 
+    uint64_t tree_search_avg = 0;
+    for (int i = 0; i < MAX_MEASURMENTS; i++) 
+    {
+        root = build_tree_from_file(filename);
+        if (root == NULL) 
+        {
+            PRINT_COLOR(RED, "Ошибка построения дерева!\n");
+            return -1;
+        }
+
+        uint64_t start_tick = tick_count();
+        search_node(root, value);
+        uint64_t end_tick = tick_count();
+        tree_search_avg += (end_tick - start_tick);
+
+        free_tree(root);
+    }
+    tree_search_avg /= MAX_MEASURMENTS;
+
+    uint64_t file_search_avg = 0;
+    for (int i = 0; i < MAX_MEASURMENTS; i++) 
+    {
+        uint64_t start_tick = tick_count();
+        int found = search_in_file(filename, value);
+        uint64_t end_tick = tick_count();
+        if (found == -1)
+            return 1;
+        file_search_avg += (end_tick - start_tick);
+    }
+    file_search_avg /= MAX_MEASURMENTS;
+
+    printf("Поиск для дерева: %" PRIu64 " тактов\n", tree_search_avg);
+    printf("Поиск для файла: %" PRIu64 " тактов\n", file_search_avg);
     return 0;
 }
 

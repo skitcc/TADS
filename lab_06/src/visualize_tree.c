@@ -1,5 +1,4 @@
-#include <stdio.h>
-#include "tree_operations.h"
+#include "visualize_tree.h"
 
 void generate_dot(node_t *root, FILE *file)
 {
@@ -32,4 +31,13 @@ void export_to_dot(node_t *root, const char *filename)
     fprintf(file, "}\n");
 
     fclose(file);
+
+    char image[LEN_FILENAME];
+    snprintf(image, LEN_FILENAME, "dot -Tpng -O %s", filename);
+    int rc = system(image);
+    if (rc == 0)
+    {
+        PRINT_COLOR(GREEN,"Дерево успешно визуализировано в файл");
+        printf("%s %s%s!\n",GREEN, filename, RESET);
+    }
 }

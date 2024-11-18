@@ -53,6 +53,24 @@ void print_mas(char **mas, int len)
     printf("\n");
 }
 
+void free_node(node_t *node)
+{
+    if (node)
+    {
+        free(node->value);
+        free(node);
+        node = NULL;
+    }
+}
+
+
+node_t *find_min(node_t *root) 
+{
+    while (root && root->left)
+        root = root->left;
+    return root;
+}
+
 void free_mas(char **mas, int len)
 {
     if (mas == NULL)
@@ -65,7 +83,7 @@ void free_mas(char **mas, int len)
     free(mas);
 }
 
-void gen_data_file(const char *filename)
+void gen_data_file(const char *filename, int len)
 {
     srand(time(NULL));
 
@@ -73,7 +91,7 @@ void gen_data_file(const char *filename)
 
     if (!file)
         return;
-    for (int i = 0; i < 1000; i++)
+    for (int i = 0; i < len; i++)
     {
         int x = 1 + rand() % (500 - 1 + 1);
 
@@ -82,4 +100,14 @@ void gen_data_file(const char *filename)
 
     fclose(file);
 }
+
+int clean_file(const char *filename)
+{
+    FILE *file = fopen(filename, "w");
+    if (file == NULL) 
+        return 1;
+    fclose(file);
+    return 0;
+}
+
 
