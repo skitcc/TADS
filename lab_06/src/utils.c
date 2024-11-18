@@ -19,11 +19,7 @@ void print_tree(node_t *root, int depth, const char *relation)
         for (int i = 0; i < depth; i++) 
             printf("  ");
         printf("[%s] %s\n", relation, root->value);
-
-        // Рекурсивно вызываем для левого потомка
         print_tree(root->left, depth + 1, "son");
-
-        // Рекурсивно вызываем для правого брата
         print_tree(root->right, depth, "brother");
     }
 }
@@ -96,20 +92,30 @@ void gen_data_file(const char *filename, int len)
     if (!file)
         return;
 
-    short *used = calloc(len, sizeof(short));
-    if (!used)
-        return;
-    
-    for (int i = 0; i < len; i++)
+    int *numbers = malloc(len * sizeof(int));
+    if (!numbers) 
     {
-        int x = 1 + rand() % len;
-        if (!used[x])
-        {
-            used[x] = 1;
-            fprintf(file, "%d\n", x);
-        }
+        fclose(file);
+        return;
     }
-    free(used);
+
+    for (int i = 0; i < len; i++) 
+        numbers[i] = i + 1;
+    
+
+    for (int i = len - 1; i > 0; i--) 
+    {
+        int j = rand() % (i + 1);
+        int temp = numbers[i];
+        numbers[i] = numbers[j];
+        numbers[j] = temp;
+    }
+
+    // Записываем числа в файл
+    for (int i = 0; i < len; i++) 
+        fprintf(file, "%d\n", numbers[i]);
+    
+    free(numbers);
     fclose(file);
 }
 
