@@ -224,8 +224,8 @@ int main(void)
                 //     PRINT_COLOR(RED, "Ошибка чтения");
                 //     return 1;
                 // }
-                open_table = create_open_table(size_of_file + 20);
-                closed_table = create_closed_table(size_of_file + 20);
+                open_table = create_open_table(size_of_file + 5);
+                closed_table = create_closed_table(size_of_file + 5);
                 read_file_to_hts(filename, closed_table, open_table);
                 PRINT_COLOR(GREEN, "Хэш-таблицы созданы и заполнены.");
                 print_ht_statistics(open_table, closed_table);

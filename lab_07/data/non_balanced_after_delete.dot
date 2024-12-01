@@ -1,4 +1,11 @@
 digraph Tree {
     node [shape=circle];
-    "5" -> "50" [style=dashed];
+    "7" -> "5";
+    "7" -> "9" [style=dashed];
+    "5" -> "3";
+    "5" -> "6" [style=dashed];
+    "3" -> "2";
+    "3" -> "4" [style=dashed];
+    "9" -> "8";
+    "9" -> "999" [style=dashed];
 }

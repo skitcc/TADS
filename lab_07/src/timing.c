@@ -199,8 +199,8 @@ int compare_time(const char *filename, int size)
     avg_closed_ht_search /= MAX_MEASURMENTS;
     comp_closed_ht_search /= MAX_MEASURMENTS;
 
-    open_table = create_open_table(1000);
-    closed_table = create_closed_table(1000);
+    open_table = create_open_table(size);
+    closed_table = create_closed_table(size);
     read_file_to_hts(filename, closed_table, open_table);
     search_open(open_table, word);
     search_closed(closed_table, word);
@@ -211,6 +211,19 @@ int compare_time(const char *filename, int size)
     free_closed_table(closed_table);
     free_open_table(open_table);
 
+    open_table = create_open_table(size);
+    closed_table = create_closed_table(size);
+
+
+    read_file_to_hts(filename, closed_table, open_table);
+    delete_open(open_table, word);
+    delete_closed(closed_table, word);
+
+    int comp_open_ht_delete = open_table->comparisons;
+    int comp_closed_ht_delete = closed_table->comparisons;
+
+    free_closed_table(closed_table);
+    free_open_table(open_table);
 
 
     printf("Удаление для BST: %" PRIu64 " тактов\n", avg_bst);
@@ -222,6 +235,9 @@ int compare_time(const char *filename, int size)
 
     printf("Удаление слова в хэш таблице с открытой адресацией: %" PRIu64 " тактов\n", avg_open_ht);
     printf("Удаление слова в хэш таблице с закрытой адресацией: %" PRIu64 " тактов\n", avg_closed_ht);
+
+    printf("Кол-во сравнений в хэш таблице с открытой адресацией %d\n", comp_open_ht_delete);
+    printf("Кол-во сравнений в хэш таблице с закрытой адресацией %d\n", comp_closed_ht_delete);
 
     printf("Поиск в BST: %" PRIu64 " тактов, сравнений: %d\n", avg_bst_search, comp_bst_search);
     printf("Поиск в AVL: %" PRIu64 " тактов, сравнений: %d\n", avg_avl_search, comp_avl_search);
