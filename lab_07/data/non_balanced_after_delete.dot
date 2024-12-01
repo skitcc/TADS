@@ -1,0 +1,4 @@
+digraph Tree {
+    node [shape=circle];
+    "5" -> "50" [style=dashed];
+}
