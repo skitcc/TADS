@@ -33,6 +33,7 @@ typedef struct opened
     char** open_table;
     int* status;
     int comparisons;
+    int count;
 } open_ht;
 
 typedef struct closed
@@ -51,10 +52,22 @@ struct tree_interface
     void *(*insert)(void *root, const char *value);
     void *(*delete)(void *node, char value, int *comparisons);
     void *(*search)(void *node, const char *value, int *comparisons);
-    void (*traversal)(void *root, bool is_measuring);
     avl_t *(*balance)(bst_t *root);
     void (*vusualise)(void *head, const char *filename, bool is_bst);
     void (*destroy)(void *head);
+};
+
+
+struct ht_interface
+{
+    void *root;
+    void *(*init)(int size);
+    void (*insert)(void *root, const char *word);
+    void *(*search)(void *root, const char *word);
+    void (*delete)(void *root, const char *word);
+    void (*destroy)(void *root);
+    void (*print)(void *root);
+    void (*print_comps)(void *root);
 };
 
 

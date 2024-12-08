@@ -39,12 +39,12 @@ avl_t *create_node_avl(const char *value)
     return new_node;
 }
 
-int max(int a, int b)
+static int max(int a, int b)
 {
     return (a > b) ? a : b; 
 }
 
-int get_height(avl_t *node)
+static int get_height(avl_t *node)
 {
     if (!node)
         return 0;
@@ -56,15 +56,12 @@ avl_t* right_rotate(avl_t *y)
     avl_t *x = y->left;
     avl_t *T2 = x->right;
 
-    // Выполняем поворот
     x->right = y;
     y->left = T2;
 
-    // Обновляем высоты
     y->height = 1 + max(get_height(y->left), get_height(y->right));
     x->height = 1 + max(get_height(x->left), get_height(x->right));
 
-    // Возвращаем новый корень
     return x;
 }
 
@@ -94,7 +91,6 @@ int get_balance(avl_t *node)
 
 void *insert_avl(void *head, const char *value)
 {
-    printf("value in iser : %s\n", value);
     avl_t *root = head;
     if (root == NULL)
         return create_node_avl(value);
@@ -134,27 +130,23 @@ void *insert_avl(void *head, const char *value)
 }
 
 
-
 void *delete_node_avl(void *head) 
 {
     avl_t *root = head;
     if (!root) 
         return NULL;
 
-    // Узел с одним или без потомков
     if (!root->left || !root->right) 
     {
         avl_t *temp = root->left ? root->left : root->right;
 
-        // Освобождаем текущий узел
-        free(root->value); // Освобождаем значение узла
-        free(root);        // Освобождаем узел
+        free(root->value);
+        free(root);
 
-        return temp;       // Возвращаем единственного потомка или NULL
+        return temp;
     }
     else
     {
-        // Узел с двумя потомками: ищем минимальный элемент в правом поддереве
         avl_t *temp = find_min_avl(root->right);
         if (!temp) 
         {
@@ -162,7 +154,6 @@ void *delete_node_avl(void *head)
             return root;
         }
 
-        // Копируем значение минимального узла
         char *new_value = strdup(temp->value);
         if (!new_value) 
         {
@@ -170,35 +161,26 @@ void *delete_node_avl(void *head)
             exit(EXIT_FAILURE);
         }
 
-        free(root->value); // Освобождаем старое значение
+        free(root->value);
         root->value = new_value;
 
-        // Удаляем минимальный узел
         root->right = delete_node_avl(root->right);
     }
 
-    // Обновляем высоту
     root->height = 1 + max(get_height(root->left), get_height(root->right));
-
-    // Балансировка
     int balance = get_balance(root);
 
-    // LL
     if (balance > 1 && get_balance(root->left) >= 0)
         return right_rotate(root);
 
-    // LR
     if (balance > 1 && get_balance(root->left) < 0) 
     {
         root->left = left_rotate(root->left);
         return right_rotate(root);
     }
-
-    // RR
     if (balance < -1 && get_balance(root->right) <= 0)
         return left_rotate(root);
 
-    // RL
     if (balance < -1 && get_balance(root->right) > 0) 
     {
         root->right = right_rotate(root->right);
@@ -295,31 +277,7 @@ void *search_node_bst(void *head, const char *value, int *comparisons)
 }
 
 
-void prefix_traversal_bst(void *head, bool is_measuring)
-{
-    bst_t *root = head;
-    if (root)
-    {
-        if (!is_measuring)
-            printf("%s ", root->value);
-        prefix_traversal_bst(root->left, is_measuring);
-        prefix_traversal_bst(root->right, is_measuring);
-    }
-}
-
-void prefix_traversal_avl(void *head, bool is_measuring)
-{
-    avl_t *root = head;
-    if (root)
-    {
-        if (!is_measuring)
-            printf("%s ", root->value);
-        prefix_traversal_avl(root->left, is_measuring);
-        prefix_traversal_avl(root->right, is_measuring);
-    }
-}
-
-void inorder_store(bst_t **array, bst_t *root, int *index) 
+static void inorder_store(bst_t **array, bst_t *root, int *index) 
 {
     if (!root)
         return;
@@ -341,18 +299,16 @@ avl_t *build_avl_tree(bst_t **array, int start, int end)
     if (!root)
         return NULL;
 
-    // Создаем копию значения
-    root->value = strdup(array[mid]->value); // Независимая копия строки
+    root->value = strdup(array[mid]->value);
     if (!root->value)
     {
-        free(root); // Освобождаем память для узла, если strdup провалился
+        free(root);
         return NULL;
     }
 
     root->left = build_avl_tree(array, start, mid - 1);
     root->right = build_avl_tree(array, mid + 1, end);
 
-    // Высота узла
     int left_height = root->left ? root->left->height : 0;
     int right_height = root->right ? root->right->height : 0;
     root->height = 1 + (left_height > right_height ? left_height : right_height);
@@ -362,7 +318,7 @@ avl_t *build_avl_tree(bst_t **array, int start, int end)
 
 
 
-int nodes_count(bst_t *root)
+static int nodes_count(bst_t *root)
 {
     if (root == NULL)
         return 0;

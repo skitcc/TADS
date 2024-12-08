@@ -27,7 +27,6 @@ void print_menu(void)
     PRINT_COLOR(TURQ, "8 - Удаление из хэш таблицы");
     PRINT_COLOR(TURQ, "9 - Поиск в хэш таблице");
     PRINT_COLOR(TURQ, "10 - Замеры по времени и памяти");
+    PRINT_COLOR(TURQ, "11 - Вывод хэш таблиц");
     PRINT_COLOR(TURQ, "0 - Выход из программы");
-
-
 }

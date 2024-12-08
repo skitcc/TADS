@@ -4,7 +4,6 @@
 void free_tree_bst(void *head)
 {
     bst_t *root = head;
-    // printf("%p\n", (void *)root);
     if (root)
     {
         free_tree_bst(root->left);
@@ -98,18 +97,6 @@ avl_t *find_min_avl(avl_t *root)
     return root;
 }
 
-void free_mas(char **mas, int len)
-{
-    if (mas == NULL)
-        return;
-    for (int i = 0; i < len; i++)
-    {
-        free(mas[i]);
-        mas[i] = NULL;
-    }
-    free(mas);
-}
-
 void gen_data_file(const char *filename, int len)
 {
     if (len > MAX_LEN_FILE)
@@ -147,15 +134,6 @@ void gen_data_file(const char *filename, int len)
     
     free(numbers);
     fclose(file);
-}
-
-int clean_file(const char *filename)
-{
-    FILE *file = fopen(filename, "w");
-    if (file == NULL) 
-        return 1;
-    fclose(file);
-    return 0;
 }
 
 

@@ -1,15 +1,18 @@
 #include "ht_operations.h"
 
 
-unsigned hash(const char *str, int size)
+static int hash(const char *str, int size) 
 {
-    unsigned hash_value = 0;
-    while (*str) 
-        hash_value = (hash_value * 31 + *str++) % size;
-    return hash_value;
+    unsigned int hash_value = 0;
+    const unsigned int prime = 31;
+
+    for (size_t i = 0; i < strlen(str); i++) 
+        hash_value = (hash_value * prime + (unsigned char)str[i]) % size;
+
+    return (int)hash_value;
 }
 
-open_ht* create_open_table(int size) 
+void *create_open_table(int size) 
 {
     open_ht* table = (open_ht*)malloc(sizeof(open_ht));
     table->size = size;
@@ -23,7 +26,7 @@ open_ht* create_open_table(int size)
         return NULL;
     }
     table->comparisons = 0;
-
+    table->count = 0;
     for (int i = 0; i < size; i++) 
     {
         table->open_table[i] = NULL;
@@ -34,12 +37,49 @@ open_ht* create_open_table(int size)
 }
 
 
-void insert_open(open_ht *table, const char *word) 
+static void resize_table(open_ht *table) 
 {
+    int new_size = table->size + 5;
+    char **new_open_table = (char **)malloc(new_size * sizeof(char *));
+    int *new_status = (int *)malloc(new_size * sizeof(int));
+    memset(new_status, 0, new_size * sizeof(int));
+
+    for (int i = 0; i < table->size; i++) 
+    {
+        if (table->status[i] == 1) 
+        {
+            int new_index = hash(table->open_table[i], new_size);
+            int original_new_index = new_index;
+            int j = 0;
+            while (new_status[new_index] == 1) 
+            {
+                new_index = (original_new_index + j) % new_size;
+                j++;
+            }
+            new_open_table[new_index] = table->open_table[i];
+            new_status[new_index] = 1;
+        }
+    }
+
+    free(table->open_table);
+    free(table->status);
+    table->open_table = new_open_table;
+    table->status = new_status;
+    table->size = new_size;
+    table->count = 0;
+}
+
+
+void insert_open(void *root, const char *word) 
+{
+    open_ht *table = root;
+    if (table->count >= table->size)
+    {
+        resize_table(table);
+    }
     unsigned int index = hash(word, table->size);
     int original_index = index;
     int i = 0;
-    // printf("index = %u\n", index);
     while (table->status[index] == 1) 
     {
         index = (original_index + i) % table->size;
@@ -49,11 +89,12 @@ void insert_open(open_ht *table, const char *word)
     table->open_table[index] = (char*)malloc(strlen(word) + 1);
     strcpy(table->open_table[index], word);
     table->status[index] = 1; 
+    table->count++;
 }
 
-// Поиск слова
-char* search_open(open_ht* table, const char* word) 
+void* search_open(void *root, const char* word) 
 {
+    open_ht *table = root;
     unsigned int index = hash(word, table->size);
     int original_index = index;
     int i = 0;
@@ -73,10 +114,10 @@ char* search_open(open_ht* table, const char* word)
     return NULL;
 }
 
-// Удаление слова
-void delete_open(open_ht* table, const char* word) 
+void delete_open(void *root, const char* word) 
 {
-    unsigned int index = hash(word, table->size);
+    open_ht *table = root;
+    int index = hash(word, table->size);
     int original_index = index;
     int i = 0;
 
@@ -99,9 +140,52 @@ void delete_open(open_ht* table, const char* word)
     }
 }
 
+int count_collisions(hash_node_t *node) 
+{
+    int count = 0;
+    while (node) {
+        count++;
+        node = node->next;
+    }
+    return count;
+}
 
+void restructure_table(closed_ht *ht) 
+{
+    int new_size = ht->size * 2;
+    hash_node_t **new_table = malloc(new_size * sizeof(hash_node_t *));
+    for (int i = 0; i < new_size; i++) 
+        new_table[i] = NULL;
 
-closed_ht* create_closed_table(int size) 
+    for (int i = 0; i < ht->size; i++) 
+    {
+        hash_node_t *node = ht->closed_table[i];
+        while (node) {
+            hash_node_t *next = node->next;
+            unsigned int new_index = hash(node->word, new_size);
+            node->next = new_table[new_index];
+            new_table[new_index] = node;
+            node = next;
+        }
+    }
+
+    free(ht->closed_table);
+    ht->closed_table = new_table;
+    ht->size = new_size;
+}
+
+void check_and_restructure(closed_ht *ht) 
+{
+    for (int i = 0; i < ht->size; i++) {
+        if (count_collisions(ht->closed_table[i]) > 3) 
+        {
+            restructure_table(ht);
+            return;
+        }
+    }
+}
+
+void *create_closed_table(int size) 
 {
     closed_ht* table = (closed_ht*)malloc(sizeof(closed_ht));
     if (!table)
@@ -122,8 +206,10 @@ closed_ht* create_closed_table(int size)
 }
 
 
-void insert_closed(closed_ht* table, const char* word) 
+void insert_closed(void *root, const char* word) 
 {
+    closed_ht *table = root;
+
     unsigned int index = hash(word, table->size);
     hash_node_t* newNode = (hash_node_t*)malloc(sizeof(hash_node_t));
     strcpy(newNode->word, word);
@@ -132,8 +218,9 @@ void insert_closed(closed_ht* table, const char* word)
 }
 
 
-hash_node_t* search_closed(closed_ht* table, const char* word) 
+void *search_closed(void *root, const char* word) 
 {
+    closed_ht *table = root;
     unsigned int index = hash(word, table->size);
     hash_node_t* node = table->closed_table[index];
 
@@ -150,8 +237,9 @@ hash_node_t* search_closed(closed_ht* table, const char* word)
 }
 
 
-void delete_closed(closed_ht* table, const char* word) 
+void delete_closed(void *root, const char* word) 
 {
+    closed_ht *table = root;
     unsigned int index = hash(word, table->size);
     hash_node_t* node = table->closed_table[index];
     hash_node_t* prev = NULL;
@@ -174,8 +262,9 @@ void delete_closed(closed_ht* table, const char* word)
     }
 }
 
-void free_closed_table(closed_ht* table) 
+void free_closed_table(void *root) 
 {
+    closed_ht *table = root;
     for (int i = 0; i < table->size; i++) 
     {
         hash_node_t* node = table->closed_table[i];
@@ -191,9 +280,9 @@ void free_closed_table(closed_ht* table)
 }
 
 
-
-void free_open_table(open_ht* table) 
+void free_open_table(void *root) 
 {
+    open_ht *table = root;
     for (int i = 0; i < table->size; i++) 
     {
         if (table->status[i] == 1) 
@@ -204,6 +293,17 @@ void free_open_table(open_ht* table)
     free(table);
 }
 
+void print_comparisons_open(void *root)
+{
+    open_ht *table = root;
+    printf("Кол-во сравнений : %d\n", table->comparisons);
+}
+
+void print_comparisons_closed(void *root)
+{
+    closed_ht *table = root;
+    printf("Кол-во сравнений : %d\n", table->comparisons);
+}
 
 void read_file_to_hts(const char* filename, closed_ht* closed_table, open_ht* open_table) 
 {
@@ -221,4 +321,36 @@ void read_file_to_hts(const char* filename, closed_ht* closed_table, open_ht* op
     }
 
     fclose(file);
+}
+
+void print_ht_open(void *root)
+{
+    open_ht *open_table = root;
+    printf("\nХеш-таблица с ОТКРЫТОЙ адресацией:\n");
+    printf("Размер таблицы: %d\n", open_table->size);
+    printf("Содержимое таблицы:\n");
+    for (int i = 0; i < open_table->size; i++) {
+        printf("  [%d]: %s\n", i,
+               (open_table->status[i] == 1) ? open_table->open_table[i] : "NULL");
+    }
+}
+void print_ht_closed(void *root)
+{
+    closed_ht *closed_table = root;
+    printf("\nХеш-таблица с ЗАКРЫТОЙ адресацией:\n");
+    printf("Размер таблицы: %d\n", closed_table->size);
+    printf("Содержимое таблицы:\n");
+    for (int i = 0; i < closed_table->size; i++) {
+        printf("  [%d]:", i);
+        hash_node_t* node = closed_table->closed_table[i];
+        if (!node) {
+            printf(" NULL\n");
+        } else {
+            while (node) {
+                printf(" -> %s", node->word);
+                node = node->next;
+            }
+            printf("\n");
+        }
+    }
 }

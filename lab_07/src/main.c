@@ -8,55 +8,6 @@
 #include "visualise_ht.h"
 #include "print_info.h"
 
-void print_tree_structure(avl_t *root, int level) 
-{
-    if (!root) return;
-
-    for (int i = 0; i < level; i++) 
-        printf("  ");
-    printf("%s\n", root->value);
-
-    print_tree_structure(root->left, level + 1);
-    print_tree_structure(root->right, level + 1);
-}
-
-void print_ht_statistics(const open_ht* open_table, const closed_ht* closed_table) 
-{
-    printf("\n=== СТАТИСТИКА ХЕШ-ТАБЛИЦ ===\n");
-
-    // Открытая адресация
-    printf("\nХеш-таблица с ОТКРЫТОЙ адресацией:\n");
-    printf("Размер таблицы: %d\n", open_table->size);
-    printf("Содержимое таблицы:\n");
-    for (int i = 0; i < open_table->size; i++) {
-        printf("  [%d]: %s\n", i,
-               (open_table->status[i] == 1) ? open_table->open_table[i] : "NULL");
-    }
-    printf("Количество сравнений в последней операции: %d\n", open_table->comparisons);
-
-    // Закрытая адресация
-    printf("\nХеш-таблица с ЗАКРЫТОЙ адресацией:\n");
-    printf("Размер таблицы: %d\n", closed_table->size);
-    printf("Содержимое таблицы:\n");
-    for (int i = 0; i < closed_table->size; i++) {
-        printf("  [%d]:", i);
-        hash_node_t* node = closed_table->closed_table[i];
-        if (!node) {
-            printf(" NULL\n");
-        } else {
-            while (node) {
-                printf(" -> %s", node->word);
-                node = node->next;
-            }
-            printf("\n");
-        }
-    }
-    printf("Количество сравнений в последней операции: %d\n", closed_table->comparisons);
-
-    printf("=== КОНЕЦ СТАТИСТИКИ ===\n\n");
-}
-
-
 
 int main(void)
 {
@@ -85,8 +36,14 @@ int main(void)
     struct tree_interface bst = init_tree_as_bst();
     struct tree_interface avl = init_tree_as_avl();
 
-    open_ht *open_table = NULL;
-    closed_ht *closed_table = NULL;
+    struct ht_interface opened = init_open_table();
+    struct ht_interface closed = init_closed_table();
+
+    opened.root = NULL;
+    closed.root = NULL;
+    
+    bst.root = NULL;
+    avl.root = NULL;
     print_menu();
 
     PRINT_COLOR(TURQ, "Введите опцию");
@@ -96,11 +53,10 @@ int main(void)
     {
         return 1;
     }
-    bst.root = NULL;
-    avl.root = NULL;
+
+
     while (option)
     {
-
         switch (option)
         {
             case BUILD_TREE:
@@ -217,18 +173,16 @@ int main(void)
             }
             case BUILD_HT:
             {
-                // PRINT_COLOR(VIOLET, "Введите размер хэш-таблицы");
-                // int size;
-                // if (fgets(buffer, sizeof(buffer), stdin) == NULL || sscanf(buffer, "%d", &size) != 1)
-                // {
-                //     PRINT_COLOR(RED, "Ошибка чтения");
-                //     return 1;
-                // }
-                open_table = create_open_table(size_of_file + 5);
-                closed_table = create_closed_table(size_of_file + 5);
-                read_file_to_hts(filename, closed_table, open_table);
+                opened.root = opened.init(size_of_file);
+                closed.root = closed.init(size_of_file);
+                read_file_to_hts(filename, closed.root, opened.root);
                 PRINT_COLOR(GREEN, "Хэш-таблицы созданы и заполнены.");
-                print_ht_statistics(open_table, closed_table);
+
+                check_and_restructure((closed_ht *)closed.root);
+                
+                opened.print(opened.root);
+                closed.print(closed.root);
+
                 break;
             }
             case ADD_HT:
@@ -241,11 +195,15 @@ int main(void)
                     return 1;
                 }
                 value[strcspn(value, "\n")] = '\0';
-                insert_open(open_table, value);
-                insert_closed(closed_table, value);
-                PRINT_COLOR(GREEN, "Слово добавлено в хэш-таблицы.");
-                print_ht_statistics(open_table, closed_table);
 
+                opened.insert(opened.root, value);
+                closed.insert(closed.root, value);
+                PRINT_COLOR(GREEN, "Слово добавлено в хэш-таблицы.");
+
+                check_and_restructure((closed_ht *)closed.root);
+
+                opened.print(opened.root);
+                closed.print(closed.root);
                 break;
             }
             case DELETE_HT:
@@ -258,11 +216,21 @@ int main(void)
                     return 1;
                 }
                 value[strcspn(value, "\n")] = '\0';
-                delete_open(open_table, value);
-                delete_closed(closed_table, value);
-                PRINT_COLOR(GREEN, "Слово удалено из хэш-таблиц.");
-                print_ht_statistics(open_table, closed_table);
 
+                opened.delete(opened.root, value);
+                closed.delete(closed.root, value);
+
+                PRINT_COLOR(GREEN, "Слово удалено из хэш-таблиц.");
+                check_and_restructure((closed_ht *)closed.root);
+
+
+                opened.print(opened.root);
+                closed.print(opened.root);
+
+                PRINT_COLOR(YELLOW, "Сравнения для таблицы с открытой адресацией");
+                opened.print_comps(opened.root);
+                PRINT_COLOR(YELLOW, "Сравнения для таблицы с закрытой адресацией");
+                closed.print_comps(closed.root);
                 break;
             }
             case SEARCH_HT:
@@ -277,8 +245,8 @@ int main(void)
                 }
                 value[strcspn(value, "\n")] = '\0';
 
-                char *open_result = search_open(open_table, value);
-                hash_node_t *closed_result = search_closed(closed_table, value);
+                char *open_result = opened.search(opened.root, value);
+                hash_node_t *closed_result = closed.search(closed.root, value);
 
                 if (open_result)
                     PRINT_COLOR(GREEN, "Слово найдено в открытой хэш-таблице!");
@@ -289,18 +257,32 @@ int main(void)
                     PRINT_COLOR(GREEN, "Слово найдено в закрытой хэш-таблице!");
                 else
                     PRINT_COLOR(RED, "Слово не найдено в закрытой хэш-таблице!");
+
+                PRINT_COLOR(YELLOW, "Сравнения для таблицы с открытой адресацией");
+                opened.print_comps(opened.root);
+                PRINT_COLOR(YELLOW, "Сравнения для таблицы с закрытой адресацией");
+                closed.print_comps(closed.root);
                 break;
             }
             case MEASURMENTS:
             {
                 compare_time(filename, size_of_file);
                 break;
+            }   
+            case PRINT_HTS:
+            {
+                if (opened.root == NULL || closed.root == NULL)
+                {
+                    PRINT_COLOR(RED, "Хэш таблицы пусты!\n");
+                    break;
+                }
+                opened.print(opened.root);
+                closed.print(closed.root);
+                break;
             }
             case 0:
             {
                 PRINT_COLOR(YELLOW, "Выход из программы");
-                // avl.destroy(avl.root);
-                // bst.destroy(bst.root);
                 return 0;
                 break;
             }
@@ -319,13 +301,16 @@ int main(void)
         
     }
 
-    bst.destroy(bst.root);
-    avl.destroy(avl.root);
-
-    if (open_table != NULL && closed_table != NULL)
+    if (bst.root != NULL && avl.root != NULL)
     {
-        free_open_table(open_table);
-        free_closed_table(closed_table);
+        bst.destroy(bst.root);
+        avl.destroy(avl.root);
+    }
+
+    if (opened.root != NULL && closed.root != NULL)
+    {
+        opened.destroy(opened.root);
+        closed.destroy(closed.root);
     }
 
 }

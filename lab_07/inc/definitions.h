@@ -23,9 +23,7 @@
 #define DELETE_HT 8
 #define SEARCH_HT 9
 #define MEASURMENTS 10
-#define OPEN_HASH 11
-#define CLOSED_HASH 12
-
+#define PRINT_HTS 11
 
 #define LEN_FILENAME 100
 #define MAX_MEASURMENTS 1000
