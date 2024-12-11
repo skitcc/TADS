@@ -10,7 +10,7 @@
 #include "ht_operations.h"
 
 
-void *build_tree_from_file(const char *filename);
+void *build_tree_from_file(const char *filename, int count);
 
 struct tree_interface init_tree_as_avl();
 struct tree_interface init_tree_as_bst();

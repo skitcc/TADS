@@ -73,7 +73,7 @@ void export_to_dot(void *head, const char *filename, bool is_bst)
     char image[LEN_FILENAME];
     snprintf(image, LEN_FILENAME, "dot -Tpng -O %s", filename);
     int rc = system(image);
-    printf("here\n");
+    // printf("here\n");
     if (rc == 0)
     {
         PRINT_COLOR(GREEN, "Дерево успешно визуализировано в файл");

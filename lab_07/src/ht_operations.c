@@ -1,13 +1,22 @@
 #include "ht_operations.h"
 
 
+
+#define FNV_OFFSET_BASIS 0x84222325
+#define FNV_PRIME 0x01000193
+
 static int hash(const char *str, int size) 
 {
-    unsigned int hash_value = 0;
-    const unsigned int prime = 31;
+    unsigned long hash_value = FNV_OFFSET_BASIS;
+    const unsigned int prime = 53;
 
     for (size_t i = 0; i < strlen(str); i++) 
-        hash_value = (hash_value * prime + (unsigned char)str[i]) % size;
+    {
+        hash_value ^= (unsigned long)str[i];
+        hash_value *= FNV_PRIME;
+    }
+
+    hash_value %= size;
 
     return (int)hash_value;
 }

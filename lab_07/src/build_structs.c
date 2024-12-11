@@ -2,7 +2,7 @@
 
 
 
-void *build_tree_from_file(const char *filename)
+void *build_tree_from_file(const char *filename, int count)
 {
     FILE *file = fopen(filename, "r");
     if (!file)
@@ -12,7 +12,8 @@ void *build_tree_from_file(const char *filename)
 
     char *word = NULL;
     size_t n = 0;
-    while (getline(&word, &n, file) != -1)
+    int c = 0;
+    while (getline(&word, &n, file) != -1 || c > count)
     {
         word[strcspn(word, "\r\n")] = '\0'; 
         if (strlen(word) == 0) 
@@ -27,6 +28,7 @@ void *build_tree_from_file(const char *filename)
         free(word); 
         word = NULL; 
         n = 0;
+        c++;
     }
 
     fclose(file);

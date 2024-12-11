@@ -48,7 +48,7 @@ typedef struct closed
 struct tree_interface
 {
     void *root;
-    void *(*init)(const char *filename);
+    void *(*init)(const char *filename, int count);
     void *(*insert)(void *root, const char *value);
     void *(*delete)(void *node, char value, int *comparisons);
     void *(*search)(void *node, const char *value, int *comparisons);

@@ -30,8 +30,7 @@ int main(void)
         return 1;
     }
 
-    printf("11111\n");
-    gen_data_file(filename, size_of_file);
+    // gen_data_file(filename, size_of_file);
 
     struct tree_interface bst = init_tree_as_bst();
     struct tree_interface avl = init_tree_as_avl();
@@ -61,7 +60,7 @@ int main(void)
         {
             case BUILD_TREE:
             {
-                bst.root = bst.init(filename);
+                bst.root = bst.init(filename, size_of_file);
                 bst.vusualise(bst.root, "./data/build_non_balanced_tree.dot", true);
                 avl.root = avl.balance(bst.root);
                 avl.vusualise(avl.root, "./data/build_balanced_tree.dot", false);
